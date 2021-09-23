@@ -13,6 +13,7 @@ class fireball
     int r, c, m, s, d;
 };
 
+
 class shark
 {
     int N,M,K;
