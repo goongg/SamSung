@@ -212,7 +212,7 @@ int dfs(  shark s)
 
 풀이 정리
 
-
+쌩 시뮬
 
 - fireball 객체를 만들고, N*N 배열 map을 만들어 fireball 객체들을 삽입
 
@@ -327,4 +327,128 @@ for(int i=0; i<N; i++) // 새 파이어볼 생성
 
 
 
+
+
+# 21.09.23 마법사 상어와 비바라기 (21610)
+
+풀이 정리
+
+쌩 시뮬 문제
+
+
+
+- 양 끝 열 , 양 끝 행 연결 되어 있는 경우
+
+  그냥 이동 해버리고, n만큼(배열 사이즈)을 더하거나 뺌
+
+  ```c++
+              c[i].first  += dy[d]*s;
+              c[i].second  += dx[d]*s;
+  
+                 
+              while(!(c[i].first>=0))    c[i].first +=n;
+              while(!(c[i].second>=0))   c[i].second +=n;    //구름 이동
+  
+              
+              while(!(c[i].first<n))    c[i].first -= (n);
+              while(!(c[i].second<n))   c[i].second -=(n);    //구름 이동
+  ```
+
+  
+
+  
+
+- 구름 vector를 만들어서 생겨나고 없어지는 것 관리
+
+  객체 정보로는 좌표만 필요하므로 pair 만들어서 벡터 처리
+
+  ```c++
+  typedef pair<int,int> pos;
+  vector<pos> c; 
+  ```
+
+  
+
+
+
+
+
+# 21.09.23 마법사 상어와 블리자드 (21611)
+
+풀이 정리
+
+쌩 시뮬 문제
+
+이거 너무 복잡하게 풀은것 같음.
+
+풀이가 너무 길어 300 라인 이상.
+
+실전에서 절대 이렇게 못 풀듯.. 타 풀이 찾아서 내꺼랑 비교해 보기
+
+
+
+달팽이 큐랑 테이블 벡터랑 옮기는 함수가 너무 길다.
+
+아래 반복문을 4개로 나눠서 하는게 아니고 하나로 처리하도록 하면 줄어들듯
+
+- 달팽이 큐의 경우 L D RR UU L L L 순으로 반복됨.
+
+```c++
+ void toQ()
+        {    
+            q.clear();        
+            int cnt=1;
+            int cx, cy, nx, ny;
+            cx= sx; cy= sy;
+            // cout<<"asdfasdf" <<cx<<" "<<cy<<endl<<endl;
+            while(1)
+            {
+
+                for(int i=0; i< cnt; i++)
+                {
+                    nx= cx -1;
+                    ny= cy;
+                    q.push_back(t[ny*n + nx]);
+                    // cout<< "L:"<< nx <<" " <<ny<<" "<<t[ny*n + nx]<<endl;
+                    cx = nx;
+                    cy = ny;
+                    if(cx==0 && cy==0)
+                        return;
+                }//L
+
+                for(int i=0; i< cnt; i++)
+                {
+                    nx= cx;
+                    ny= cy +1;
+                    q.push_back(t[ny*n + nx]);
+                    // cout<< "D:"<< nx <<" " <<ny<<" "<<t[ny*n + nx]<<endl;
+                    cx= nx;
+                    cy =ny;
+                }//D
+
+                cnt++;
+                for(int i=0; i< cnt; i++)
+                {
+                    nx= cx +1;
+                    ny= cy ;
+                    q.push_back(t[ny*n + nx]);
+                    // cout<< "R:"<< nx <<" " <<ny<<" "<<t[ny*n + nx]<<endl;
+                    cx= nx;
+                    cy =ny;
+                }//R
+
+                for(int i=0; i< cnt; i++)
+                {
+                    nx= cx ;
+                    ny= cy -1;
+                    q.push_back(t[ny*n + nx]);
+                    // cout<< "U:"<< nx <<" " <<ny<<" "<<t[ny*n + nx]<<endl;
+                    cx= nx;
+                    cy =ny;
+                }//U
+                cnt++;
+            }
+            
+        }
+```
 
