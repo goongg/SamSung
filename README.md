@@ -160,6 +160,52 @@ void move_fish()
 
 
 
+- dfs
+
+  1. 최대 뻗을 수 있는 노드는 3개 for문 3번씩 돌려서 가지치기
+
+  2. arrive 변수가 visit 역할 수행
+  3. dfs_ans는 전역변수로 마지막에 return 만, (종료 depth조건 불 필요)
+  4. 동일한 물고기 함수로 bfs로도 풀어보기
+
+```c++
+
+int dfs(  shark s)
+{
+
+    if( dfs_ans < s.a) dfs_ans= s.a;
+    
+        for(int i=1; i<=3; i++) //많이 가봐야 최대 3칸
+        {
+            shark ns=s;
+            ns.posible=0;
+            if( s.sc + dy[s.b]*i >=0 && s.sc + dy[s.b]*i <4 &&
+                 s.sr + dx[s.b]*i  >=0 && s.sr + dx[s.b]*i <4 &&
+                    s.arrive[s.map[ (s.sc + dy[s.b]*i)*4+  s.sr + dx[s.b]*i].a] ) // 절로 갈 수 있으면       
+            { 
+                ns.posible=1;
+                ns.sc= s.sc + dy[s.b]*i;
+                ns.sr= s.sr + dx[s.b]*i;            //상어 위치 이동
+                ns.a += s.map[ ns.sc*4+  ns.sr].a;  //잡아먹고
+                ns.b = s.map[ ns.sc*4+  ns.sr].b;   //방향 저장 
+                ns.map[ ns.sc*4+  ns.sr].a=0; 
+                ns.map[ ns.sc*4+  ns.sr].b=0;
+                 
+                ns.arrive [ns.map[ ns.sc*4+  ns.sr].a] =0;
+
+                ns.move_fish();
+
+
+                dfs(ns);
+            }
+        }
+
+    return dfs_ans;
+
+}
+```
+
+
 
 # 21.09.24 마법사 상어와 파이어볼 (20056)
 
@@ -280,50 +326,4 @@ for(int i=0; i<N; i++) // 새 파이어볼 생성
 
 
 
-
-
-- dfs
-
-  1. 최대 뻗을 수 있는 노드는 3개 for문 3번씩 돌려서 가지치기
-
-  2. arrive 변수가 visit 역할 수행
-  3. dfs_ans는 전역변수로 마지막에 return 만, (종료 depth조건 불 필요)
-  4. 동일한 물고기 함수로 bfs로도 풀어보기
-
-```c++
-
-int dfs(  shark s)
-{
-
-    if( dfs_ans < s.a) dfs_ans= s.a;
-    
-        for(int i=1; i<=3; i++) //많이 가봐야 최대 3칸
-        {
-            shark ns=s;
-            ns.posible=0;
-            if( s.sc + dy[s.b]*i >=0 && s.sc + dy[s.b]*i <4 &&
-                 s.sr + dx[s.b]*i  >=0 && s.sr + dx[s.b]*i <4 &&
-                    s.arrive[s.map[ (s.sc + dy[s.b]*i)*4+  s.sr + dx[s.b]*i].a] ) // 절로 갈 수 있으면       
-            { 
-                ns.posible=1;
-                ns.sc= s.sc + dy[s.b]*i;
-                ns.sr= s.sr + dx[s.b]*i;            //상어 위치 이동
-                ns.a += s.map[ ns.sc*4+  ns.sr].a;  //잡아먹고
-                ns.b = s.map[ ns.sc*4+  ns.sr].b;   //방향 저장 
-                ns.map[ ns.sc*4+  ns.sr].a=0; 
-                ns.map[ ns.sc*4+  ns.sr].b=0;
-                 
-                ns.arrive [ns.map[ ns.sc*4+  ns.sr].a] =0;
-
-                ns.move_fish();
-
-
-                dfs(ns);
-            }
-        }
-
-    return dfs_ans;
-
-}
-```
 
