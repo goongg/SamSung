@@ -4,6 +4,102 @@
 
 
 
+# 21.09.25 연구소 (14502)
+
+풀이 정리
+
+바이러스 퍼트리는건 bfs로
+
+벽 3개 세우는건 부르트포스로 넣음
+
+
+
+- 바이러스 퍼트리기
+
+  input과정에서 바이러스 위치를 큐에 저장.
+
+  바이러스를 하나씩 꺼내면서 그 곳을 기준으로, 4방향을 조사해 퍼트릴 곳이 있으면 큐에 넣음
+
+  map에 퍼트린곳에 2 처리를 하니까 따로 visit처리 할 필요는 없음
+
+- 퍼트리는 작업은 여러번 해야 하니까, 실 작업은 바이러스 큐랑, 맵 버퍼를 따로 만들어서 처리(nt, w)
+
+```C++
+   int spread() //퍼짐, 안전영역 계산
+    {
+        vector<int> nt =t;
+        queue<p> w=v;
+        int ret=0;
+        p cr;
+        
+        while(!w.empty())
+        {
+            cr = w.front();
+            w.pop();
+            for(int i=0; i<4 ; i++) //4방향 조사
+            {
+                if( cr.first+dy[i] >=0 && cr.first+dy[i] <n &&
+                        cr.second +dx[i]>=0 && cr.second+dx[i] <m &&
+                            nt[ (cr.first+dy[i])*m + cr.second+dx[i] ]==0 )  //범위안이고 0이면 가지치기
+                        {
+                            w.push(make_pair(cr.first+dy[i], cr.second+dx[i] ));
+                            nt[ (cr.first+dy[i])*m + cr.second+dx[i] ]=2;       //방문 처리
+                        }
+            }
+        }
+        for(int i=0; i<n*m; i++) if(nt[i]==0) ret++;    //안전영역만큼 ++
+
+#if debug
+cout<<endl;
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++)
+                cout<<nt[i*m+j]<<" ";
+        cout<<endl;
+        }
+cout<<endl;       
+#endif
+
+        return ret;
+    }
+```
+
+
+
+- 벽 3개 넣기
+
+1차원 배열로 맵을 만들었으니까 걍 전체에서 3개 조합으로 만들면 됨,
+
+조합(다음 for문 이전꺼 다음차례부터 돌리기)
+
+순열(다음 for문 처음부터 돌리기)
+
+```c++
+    int sol()
+    {
+        // 0 ~ n*m-1 중 3개를 뽑으면 됨, 순서 상관x
+        input();
+        int max = -1;
+        int ret;
+        for(int i=0; i<n*m-2; i++)
+            for(int j=i+1; j<n*m-1; j++)
+                for(int k=j+1; k<n*m; k++)
+                    if(t[i] == 0 && t[j] == 0 &&  t[k] == 0)    //세개 다 빈칸인 경우에 벽세우고 퍼트리기
+                    {  
+                        t[i]=1; t[j]=1; t[k]=1;
+                        ret= spread();
+                        if(max < ret) max= ret;
+                        t[i]=0; t[j]=0; t[k]=0;
+                    }
+        return max;
+    }
+```
+
+
+
+
+
+
+
 # 21.09.25 게리멘더링2 (17779)
 
 풀이 정리
