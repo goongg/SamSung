@@ -2,6 +2,292 @@
 
 [TOC]
 
+# 21.09.25 드래곤 커브 (15685)
+
+풀이정리
+
+쌩 시뮬 규칙찾기? 
+
+
+
+- 규칙 찾기 90도 회전
+
+도형(선)을 90도 돌릴라고 생각하지말고, 점을 90도 돌려야 댄다고 생각함
+
+다음세대로 뻗기 전에, 그 전 세대의 마지막 점 (end_point) 를 기준으로 90도 시계방향 으로 돌려야 함.
+
+
+
+기준점을 기준으로 특정 점을 90도를 돌리는 함수 만듬
+
+90도 회전은 기준점을 (0,0)으로 평행이동 시키면
+
+(x',y') = (-y, x) 로 바뀜
+
+수학에서 x축 y축으로 보면 -90도 만큼 회전 변환인데.. y축 방향이 반대라 헷갈림
+
+```c++
+    p lotate(p d, p z)
+    {
+        int dif_x= 0- z.first;
+        int dif_y= 0- z.second;
+        // 0,0으로 이동시킴
+        d.first += dif_x;
+        d.second += dif_y;
+        int buf= d.first;
+        d.first = -1*d.second;
+        d.second = buf;
+
+        d.first -= dif_x;
+        d.second -= dif_y;
+    return d;
+    }
+```
+
+
+
+- 현재의 세대와 점들을 벡터로 정보를 저장하는 curve객체를 만듬
+
+```c+++
+class curve
+{
+    int g=0;
+    int dest_g;//여기까지 진화해야댐
+    p end_point; 
+public:
+    vector<p> line;
+
+```
+
+
+
+- end 포인트를 기준으로 자신의 모든 점을 90도 회전 시키면 다음 세대가 됨
+
+```c++
+    //다음 세대로 진화하는 함수
+    void evolution()
+    {   
+        //모든 점을, end point 를 기준으로 돌리고,
+        //돌린점을 next_line에 넣어,
+        //현재 line에 next_line을 다 넣고
+        //겹친걸 제거 g를 하나 키움
+        vector<p> next_line;        
+        p new_end_point= lotate(line[0],end_point);
+        for(p i: line) 
+            next_line.push_back(lotate(i ,end_point));
+        // next_line.pop_back();
+        for(p i: next_line)
+            line.push_back(i);
+        g++;
+        end_point= new_end_point;   
+#if debug
+    cout<<endl;
+        for(p i : line)
+           cout<<"g:"<<g<<" x,y:" <<i.first<<","<<i.second<<endl;
+    cout<<endl;
+#endif
+
+    }
+
+```
+
+
+
+- 최종 도형 f (curve 객체의 모든 점) 을 한곳에 모음
+
+```c++
+for(int i=0; i<n; i++)
+{    c[i].init(x[i],y[i],d[i],g[i]);
+    for(int j=0; j<g[i]; j++)
+        c[i].evolution();
+        c[i].uni();
+    for(p ii: c[i].line)
+    f.push_back(ii);
+}
+    f.erase(unique(f.begin(), f.end()),f.end());//겹치는 점 제거
+    // f.erase(unique(f.begin(), f.end()),f.end());
+
+```
+
+
+
+- f 객체에서 맵에 점을 찍고 점이 4개 정사각형 되면 answer++;
+
+```c++
+    for(p i: f)
+    {
+#if debug
+        cout <<cnt++<<":"<<i.first<<" "<<i.second<<endl;
+#endif
+        visit[i.second*101 +i.first ]= true;
+    }
+    int answer=0;
+    for(int i=0; i<100; i++)
+        for(int j=0; j<100; j++)
+            if(visit[i*101 +j] &&  visit[(i+1)*101 +j] && 
+                    visit[i*101 +j+1] &&  visit[(i+1)*101 +j+1])
+                        answer++;
+
+```
+
+
+
+
+
+
+
+
+
+# 21.09.26 연구소3 (17142)
+
+풀이 정리
+
+쉬워보이고 연구소 1이랑 매우 비슷한데... 3시간안에 디버깅 실패
+
+78%에서 시간초과가 나는걸 시간안에 해결 못했음. 어디가 코드가 무거운 듯
+
+실전이었으면 떨어졌을 문제
+
+
+
+우선 풀이는, 바이러스 m개 선택은 순열 써서 만들었고
+
+바이러스 퍼트리는건 BFS를 변형해서 풀음
+
+
+
+바이러스 선택 코드
+
+- 바이러스의 최대 갯수는 N*N : 2500 개 그중 최대로 뽑아야 하는 갯수는 10개
+
+  그려면 2500 C 10 이 최대 
+
+  이 갯수만큼 BFS를 돌린다
+
+  -> 이게 너무 큰 숫자 인듯
+
+   -> 그러면 바이러스 덩어리를 만들어서 문제를 풀어야 했나?
+
+  
+
+```c++
+
+    int sol()
+    {
+        int min=1000000;
+        input();
+        int check=0;
+
+        for(int k=0; k< n*n; k++) {
+            if(t[k]==0)
+                check = 1;
+            }
+        if(check==0) return 0;
+
+        vector<int> Combination;
+        vector<int> vi, vii;
+
+        for(int i=0; i <n*n ; i++)
+            if(t[i]==2) vi.push_back(i);
+        
+        for(int i=0; i<m; i++) Combination.push_back(1);
+        while(Combination.size() < vi.size()) Combination.push_back(0);
+        sort(Combination.begin(), Combination.end());
+
+        // cout<<"------------------------------"<<endl;
+        do
+        {
+            vii.clear();
+            for( int i =0; i< Combination.size(); i++)
+                if(Combination[i]==1)
+                {    
+                    vii.push_back(vi[i]);
+                    // cout<<vi[i]<<" ";
+                }
+            ret= spread(vii);
+            cout<<endl<<"ret:"<<ret<<endl;;
+            if( ret!=-1 && ret<min) min= ret;
+            ret =min;
+
+        }while( next_permutation(Combination.begin(), Combination.end()));
+        
+
+            if(min == 1000000) return -1;
+        return min;
+    }
+
+```
+
+
+
+- 바이러스 퍼트리기
+- 
+
+```c++
+    int spread(vector<int> vi)     //바이러스 위치를 입력으로 받음
+    {
+        bool check=0;
+
+        queue<int> v;
+        queue<int> nv;
+        vector<int> nt=t;
+        time=0;
+        for(int i: vi)
+        {   
+            v.push(i);
+            nt[i]=4;
+        }
+
+        int cnt=0;
+        bool flag=0; // 이 단계에서 바이러스를 찾았는지?
+while(!v.empty())
+        {
+            int vv= v.front();
+            v.pop();
+
+            for(int d=0; d<4; d++)
+            {
+                if( (vv/n) + dy[d] >=0 && (vv/n) + dy[d] <n &&
+                    (vv%n) + dx[d] >=0 && (vv%n) + dx[d] <n &&
+                        (nt[ ((vv/n)+dy[d])*n+  (vv%n) + dx[d]] == 2 || nt[ ((vv/n)+dy[d])*n+  (vv%n) + dx[d]] == 0)
+                ) // 퍼질수 있는게 있으면 퍼트림
+                {
+                    nt[ ((vv/n)+dy[d])*n+  (vv%n) + dx[d]]=4;   //활성 바이러스는 4로 표시
+                    nv.push( ((vv/n)+dy[d])*n+  (vv%n) + dx[d] ); //새로 추가된 바이러스 목록
+                    flag=1;
+                }
+            }
+
+            if(v.empty())     //현재 조사한게 마지막 바이러스 였다면,
+            {
+                time++; //시간을늘리고
+                if(ret!=-1 && time>=ret)
+                    return -1;
+
+                v= nv;  //새로 추가한 바이러스들을 다시 큐에 넣어
+                while(!nv.empty()) nv.pop();    //nv는 클리어
+
+
+                check=0;
+                for(int k=0; k< n*n; k++) {
+                   if(nt[k]==0)
+                   check = 1;
+                }
+                if(check==0) return time;
+            }
+        }
+
+        return -1;
+
+    }
+```
+
+
+
+
+
+
+
 
 
 # 21.09.25 연구소 (14502)
