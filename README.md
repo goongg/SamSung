@@ -2,6 +2,208 @@
 
 [TOC]
 
+
+
+# 21.09.28 다리만들기 (17472)
+
+풀이정리
+
+1각자 다리를 구분해서 저장하는것은 bfs로
+
+2.다리를 연결 하는 과정은 dfs로 풀 다가 실패함
+
+3시간 넘어 4시간 넘게 풀어봤는데 못풀겠음. 문제 난이도가 너무 높은듯
+
+주말에 다른사람 풀이 찾아서 다시 풀어보기
+
+
+
+- land 객체를 만들어서, 자신의 땅 정보, 땅 이름(index) 를 저장한다
+
+  ```c++
+  class land
+  {
+      public:
+      int num; //섬의 이름
+      vector<int> eirth;
+      vector<int> connected; //연결된 섬의 index를 넣음
+      vector<int> b;// 다리의 갯수를 계산할때 필요
+  };
+  ```
+
+
+
+- 땅을 구분하는 함수 search_land()
+
+  전체 맵을 돌려서, 땅이 나오면 (1), 그 주변에 연결되어있는 땅들을 찾음
+
+  ```c++
+  
+  void serch_land()
+  {
+      queue<int> q, v;
+      land ll;
+      int index=0;
+      visit= vector<bool>(n*m);
+      for(int i=0; i< n; i++)
+      {    
+          for(int j=0; j<m; j++)
+          {
+              if( t[i*m+ j] != 0 &&  !visit[i*m+ j]) 
+                //섬을 찾았으면, 이곳을 기준으로 bfs를 돌려서 섬을찾음
+              {
+                  q.push(i*m+ j);
+                  visit[i*m+j]=true;
+                  ll.num = index++;
+                  ll.eirth.push_back(i*m+ j);    
+                  while(!q.empty())
+                  {
+                      int ii = q.front();
+                      int x=ii%m;
+                      int y=ii/m;
+                      q.pop();
+                      for(int d=0; d<4; d++) //네방향 조사
+                      {
+                          if(y+dy[d]>=0 && y+dy[d]<n &&
+                              x+dx[d]>=0 && x+dx[d]<m)
+                              if(t[(y+dy[d])*m +x+dx[d]] !=0 
+                                  && !visit[(y+dy[d])*m +x+dx[d]])
+                              {
+                                  q.push( (y+dy[d])*m +x+dx[d] );
+                                  visit[(y+dy[d])*m +x+dx[d] ]=1;
+                                  ll.eirth.push_back( (y+dy[d])*m +x+dx[d]);
+                              }
+                     }
+                  }
+                  //주변 섬을 다 찾았으면
+                  l.push_back(ll);
+  #if debug
+                  cout<<endl<<index-1 <<"'s eirth:"; 
+                  for(int i: ll.eirth)
+                      cout<<i<<" ";
+                  cout<<endl;
+  #endif                
+                  ll.eirth.clear();                
+              }
+          }
+      }
+      visit.clear();
+  }
+  ```
+
+  
+
+- 땅끼리 연결하는 함수
+
+```c++
+
+int connect(int cur, int ex)
+{
+#if debug
+cout <<"\n cur:"<<l[cur].num <<" visit_land_cnt:"<<visit_land_cnt <<" bridge size:"<<bridge_size <<endl<<endl;
+#endif
+    for(int i=0; i< visit.size(); i++)
+        visit[i]=0
+    visit[cur]=1;   //자 자신이랑 지나온 곳은 미 포함
+    visit[ex]=1;   //자 자신이랑 지나온 곳은 미 포함
+
+    if(visit_land_cnt == l.size()) //모든 땅을 돌았을 때,
+    {
+        if(bridge_size<mmin) 
+            mmin=bridge_size;
+        cout<<"-----------------end!---------------------"<<endl;
+        cout<<"bridge size:"<<mmin<<endl;
+        return mmin;
+    }
+
+       //현재 땅에서 갈 수 있는 섬을 조사
+        int x, y;
+        int nx, ny;
+        for(int ii : l[cur].eirth)//땅 주변 바다를 찾아
+        {
+            x= ii%m; y= ii/m;
+            nx=x; ny=y;
+            cout<<"find from"<<ii <<" "<<x<<" "<<y<<endl;
+            
+            vector<int> bridge;   
+            for(int d=0; d<4; d++) //네방향 조사
+            {                
+                if(y+dy[d]>=0 && y+dy[d]<n &&
+                    x+dx[d]>=0 && x+dx[d]<m &&
+                        t[(y+dy[d])*m +x+dx[d]] ==0 )   //바다를 찾았을 경우,
+                    {
+                        bool throuing=0;
+                        while(1)                        //루프를돌아 바다 건너편에 다른 땅을 찾아
+                        {
+                            nx+= dx[d]; ny +=dy[d];
+                            if(!(nx >=0 && nx<m && ny>=0 && ny<n))  //땅을 못찾고, 범위를 넘어간 경우 break;
+                            {
+                                nx=x; ny=y;
+                                bridge.clear();
+                                break;
+                            }
+                            if(t[ny*m + nx]==0)                     //바다를 건너는 중이면 인덱스를 넣어
+                            {
+                                cout<<"throu: "<<ny*m + nx<<" "<<x<<" "<<y<<endl;
+                                throuing=1;
+                                bridge.push_back(ny*m + nx);
+                                continue;
+                            }
+
+                            else if(t[ny*m + nx]==1 && throuing)  //섬을 찾은 겨우        //바다를 건너 땅을 찾은 경우
+                            {
+                                throuing=0;
+                                cout<<"is visited?:" <<ny*m + ny<<endl;
+                                for(land ll : l)                    //내가 찾은 땅이 몇번째 땅인지를 조사
+                                {
+                                    bool is_find=0;
+                                    for(int iii: ll.eirth)
+                                    {
+                                        if(iii==ny*m+nx)
+                                        {
+                                            if(!visit[ll.num])      //방문한 적 없는 땅이면
+                                            {
+                                                cout<<"find land:"<<nx*m + ny<<" " <<ll.num<<" bridge_size:" <<bridge.size() <<endl;
+                                                for(int i: bridge) cout<< i<<" ";
+                                                cout<<endl;
+                                                if(bridge.size()>=2)
+                                                {
+                                                    bridge_size += bridge.size();
+                                                    visit[ll.num]=1;          //이 땅을 방문처리                                                
+                                                    visit_land_cnt++;
+                                                    connect(ll.num);        //찾은 땅에서 다시 연결 시도
+                                                    visit_land_cnt--;
+                                                    bridge_size -= bridge.size();
+                                                    bridge.clear();
+                                                    visit[ll.num]=0;
+                                                }
+                                                is_find=1;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(is_find)
+                                        break;
+                                }
+                            }
+                        }
+
+                    }        
+            }
+        }
+
+    
+
+if(mmin!=init_num)
+return mmin;
+else
+return -1;
+
+}
+```
+
+
+
 # 21.09.27 상어 초등학교 (21608)
 
 풀이정리
