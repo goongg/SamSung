@@ -4,6 +4,120 @@
 
 
 
+# 21.09.29 캐슬디팬스 (17135)
+
+풀이정리
+
+쌩 시뮬 입력케이스(궁수 배치) 는 for 문 세번돌려 조합으로 넣음
+
+딱봐도 쉬운 문제인데 문제를 잘못읽어 너무오래걸림 대충 감 잡혀도 문제 똑바로 다시 읽고 시작하기
+
+
+
+- 배치된 궁수 위치로 점수를 계산하는 함수
+  1. 턴은, 보드의 행 갯수 반복하면 됨 end = n;
+  2. 궁수의 배열로 반복을 돌려서, 가장 가까운 거리의 적들을 조사하고, 그중 가장 왼쪽에서 가장 작은 적을 타겟으로 설정
+  3. 타겟을 targets 배열에 넣고, 적들의 배열로 반복을 돌려, 제거 타겟목록에 없으면 살리고 한칸전진
+
+```c++
+    int clac_score(vector<int> bow)
+    {
+
+        if(enemy.size()==0) return 0;
+        vector<int> nt=t;    
+        vector<int> nenemy = enemy;
+        vector<int> targets;
+        int score=0;
+        int end= end_time;
+
+        while(end >0)
+        {
+            end--;
+            //궁수 공격 턴, 새 타겟을 찾음
+            if(nenemy.size()==0) break;
+            targets.clear(); 
+
+            for(int i: bow)
+            {
+                int target;
+                int dis_min=999999999;
+                int dis;
+                int x_min=m+1;
+                
+                for(int e : nenemy) //거리가 가장 가까운 적 후보들 정리
+                {
+                    dis=distance(i, e); 
+                    if(dis <= d && dis <=dis_min)
+                        dis_min= dis;
+                }
+                if(dis_min != 999999999) //적을 하나라도 찾은 경우
+                {
+                  //거리가 가장 가까운 애들 중에서 가장 왼쪽에 있는애를 타겟으로 결정
+                    for(int e : nenemy) 
+                    {
+                        dis=distance(i, e); 
+                        if(dis == dis_min)
+                            if(e % m < x_min){
+                                x_min = e % m;
+                                target = e;
+                            }
+                    }
+                    targets.push_back(target);  // 타겟을 넣음
+                }
+            }
+
+            vector<int> nnenemy;
+            for(int i: nenemy)//타겟이 된 적들을 제거
+            {
+                bool check=0;
+                for(int j: targets){
+                    if(j==i)  check = 1;      //이 적이 타겟이 된 적이 있는 적인지 조사        
+                }
+                if(!check) nnenemy.push_back(i+m);          //타겟이 아닌 적들의 위치를 전진시켜서 넣음
+                else score++;   //타겟이 된 적 있는 적이면 스코어 ++;
+            }
+            nenemy.clear();
+            for(int i : nnenemy)
+                if( i < n*m) nenemy.push_back(i);
+        }
+
+        return score;
+    }
+
+```
+
+  
+
+- sol 함수
+
+```c++
+  int sol()
+    {
+        int ret;
+        int ret_max= -1;
+        input();
+
+        //궁수 위치 조합 세개 뽑음
+        for(int i=0; i<m-2; i++)
+            for(int j=i+1; j<m-1; j++)
+                for(int k= j+1; k<m; k++)
+                {
+                    bowman.clear();
+                    bowman.push_back(n*m+ i);
+                    bowman.push_back(n*m+j);
+                    bowman.push_back(n*m+k);
+                    ret= clac_score(bowman);
+                    if(ret_max < ret) ret_max= ret;
+                }
+    
+        return ret_max;
+    }
+```
+
+
+
+
+
 # 21.09.28 다리만들기 (17472)
 
 풀이정리
