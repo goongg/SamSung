@@ -4,6 +4,112 @@
 
 
 
+
+
+
+
+# 21.09.30 낚시왕 (17143)
+
+풀이 정리
+
+시뮬 + **시간복잡도 계산** + **규칙 찾기**
+
+시뮬 구현이랑, 테케 까지는 간단한 문제인데 시간초과 해결이 너무 오래 걸림. 실전이라면 떨어졌을듯 
+
+지금까지는 input조건을 보고 어디서 시간 초과가 날 수 있을지 전혀 고려하지 않고 풀고있는듯
+
+테스트 케이스 다풀고 input 파라미터로 시간복잡도를 계산해보는 습관을 들여야 할듯...
+
+
+
+- 1.상어 이동의 시간 복잡도 
+
+이 문제에선 눈에 띄는 인풋 범위가 존재하는데
+
+  1. M= 100 x 100 (R x C)
+
+  2. s = 1000
+
+  3. z=10000 
+
+아래처럼 코드를 짜면 상어의 속력만큼 물고기를 이동 시켜야 하는데, 상어 하나당 1000번 씩 루프를 돌게 됨
+
+그러면 10,000 x 1,000 = 10,000,000 인데, 이게 천만번
+
+이 루프를 게임이 끝날떄까지 돌아야 하므로 또 열의 최댓값 만큼 곱 (100)
+
+총 1,000,000,000 물고기 움직이는데만 10억번 루프를 돌아야 하는게 말이 안됨
+
+```c++
+                for(int s=0; s< sharks[i].s; s++) //상어의 속력만큼 반복
+                {
+                    if( sharks[i].y + ddy >=0 && sharks[i].y + ddy <Y &&
+                            sharks[i].x + ddx >=0 && sharks[i].x + ddx <X)  //끝에 닿지 않았으면 이동
+                    {
+                        sharks[i].x += ddx;
+                        sharks[i].y += ddy;
+                    }
+                    else{
+                        cnt++;  //방향을 바꾼횟수를 기억
+                        ddy *= -1;
+                        ddx *= -1;
+                        sharks[i].y += ddy;
+                        sharks[i].x += ddx; //방향을 반대로 바꿔서 이동
+                    }
+                }
+
+                //이 상어의 이동이 다 끝난순간에 방향을 홀수번 바꿨으면
+                if(cnt%2 ==1)   
+                {
+                    if(sharks[i].d ==0 )      sharks[i].d++;
+                    else if(sharks[i].d ==1 ) sharks[i].d--;
+                    else if(sharks[i].d ==2 ) sharks[i].d++;
+                    else if(sharks[i].d ==3 ) sharks[i].d--;
+                }
+```
+
+
+
+-  input 함수에서 시간단축 가능
+
+  하나씩 반복해보면 R 의 크기가 5라는 가정하에,
+
+  속도가 0, 8, 16, 24 인 경우 모두 제자리로 가는것을 확인
+
+  즉 (2*R-2) 만큼 모듈러 연산을하면, 총 연산량이 백배 단위로 줄어들게 되서 해결 되더라...
+
+  
+
+  ```c++
+    void input()
+      {
+          cin>>Y>>X>>M; 
+          sharks = vector<shark>(M);
+          dead = vector<bool>(M) ;
+          t = vector<ss>(X*Y);
+  
+          for(int i=0; i<M; i++)
+          {
+              cin>>sharks[i].y>>sharks[i].x>>sharks[i].s>>sharks[i].d>>sharks[i].z; 
+              sharks[i].y--;
+              sharks[i].x--;
+              sharks[i].d--;
+              sharks[i].num=i; 
+              if(sharks[i].d ==0 || sharks[i].d==1)
+                  sharks[i].s %= (2*Y -2);
+              if(sharks[i].d ==2 || sharks[i].d==3)
+                  sharks[i].s %= (2*X -2);
+  
+          }
+  ```
+
+
+
+
+
+
+
+
 # 21.09.29 캐슬디팬스 (17135)
 
 풀이정리
