@@ -6,6 +6,201 @@
 
 
 
+# 21.10.02 새로운 게임2 (17837)
+풀이정리
+쌩 쌩 시뮬 노가다
+
+인풋 숫자가 너무 작아 딱봐도 시간복잡도는 큰 문제가 안됨. **진짜 구현 그 자체만 너무 복잡한 문제**
+
+이동을 한번에 해서 풀라고 하지말고, 1회씩 이동하게 함수를 짠 다음 중간 디버깅 하자는 전략
+
+
+
+- 주의할 점 벡터로 루프를 돌릴때, 루프가 돌면서 그 벡터 값이 바뀌도록 짜면 에러가 날 확률이 높음
+
+- 게임이 끝나는 조건을 잘 체크 해야됨, 이번 턴의 이동이 다끝날때 조건체크를 하는게 아니고,
+
+  턴 중간중간 모든 이동에서 조건체크를 해야 함
+
+  
+
+  
+
+
+
+- 사용한 객체 변수들
+
+  horse에 말 정보들을 넣음.
+
+  칸의 색깔을 기억하는 int 배열, 
+
+  칸별로 말의 목록을 저장할 horse 객체 배열
+
+  말 목록 
+
+```c++
+class horse{
+    public:
+    int y, x; //위치
+    int num; //말의 숫자
+    int d; //방향
+    int n; //내칸에서 내가 몇번쨰인지
+};
+typedef vector<horse> hh;
+
+class game{
+    int n, k;
+    vector<int> t;  //보드 칸 색깔 저장
+    vector<hh> ht;  //보드 칸에 쌓여있는 말
+    vector<horse> h;  // 전체 말 목록
+    int turn=0;
+    bool end=0;
+    public:
+  
+```
+
+
+
+- 말을 1회 이동 하는 함수
+
+  
+
+  1. **말을 하나씩 꺼내서 다음으로 이동할 칸이 어떤 색 칸인지를 확정지음**
+     - i 번째 말의 위치와 방향을 기반으로 t변수에서 색깔을 확인
+     - 갈 수 있는 색깔이면 다음 이동 좌표를 nx ny에 넣고 색깔을 저장
+
+  ```c++
+  for(int i=0; i<h.size(); i++) //말들을 하나씩 옮김
+          {
+              int my_num;
+              int color;
+              int x = h[i].x; //옮기려는 말의 위치
+              int y = h[i].y; //옮기려는 말의 우치
+              int d = h[i].d;
+              int num= ht[y*n +x].size(); //움직이려는 칸위에 있는 말의 갯수
+  
+              //어디로 옮길지, 옮기는 규칙을 정함
+              int nx = x+ dx[d];
+              int ny = y+ dy[d];
+              
+              if( t[ny*n+nx] == blue || (nx <0) 
+                	|| (nx >= n) || (ny <0) || (ny >=n) ) //옮길수 없거나 파랑
+              {
+                  color =blue;
+                  nx -= 2*dx[d];
+                  ny -= 2*dy[d];// 방향을 바꿈
+                  if( d == 0)      d++;
+                  else if( d == 1) d--;
+                  else if( d == 2) d++;
+                  else if( d == 3) d--;
+                  ht[y*n+ x][h[i].n].d =d;
+  
+                  if( t[ny*n+nx] == blue || (nx <0) || (nx >= n) || (ny <0) || (ny >=n) ) //한번 더 조사 
+                      color = -1;
+                  //가만히 
+                  else
+                      color = t[ny*n+nx];
+              }
+              else{
+                  color= t[ny*n+nx] ;
+              }
+  ```
+
+  
+
+2. **색깔별로 실제 이동을 구현하는 부분.**
+
+   - 하얀색이면, 지금 현재 칸에 저장된 말들을 하나씩, 지금 말부터 순서대로 꺼냄
+
+   - 꺼내서 좌표를 위에서 확정한 다음좌표 (nx, ny)로 이동
+
+     `ht[y*n+ x][j].x = nx;` 
+
+	- 다음 위치로 이동할 때, 다음 칸에 사이즈가 그칸에서의  자신 순번이 됨
+
+     `ht[y*n+ x][j].n= ht[ny*n +nx ].size();`
+   
+   - 꺼낸 갯수를 기억해 놓고 현재위치에서 빠진 갯수만큼 pop_back()
+   
+   - 빨간색이면 꺼내는 순서를 마지막부터, 지금말의 순서까지로, 루프의 반향만 바꿈
+   
+     `for(int j= num-1  ; j>= buf; j--)`
+
+```c++
+ if(color == -1)
+            {
+                continue;
+            } //아무것도 안함
+            else if(color==white)   //순서대로 이동
+            {
+                int buf = h[i].n;
+                for(int j= buf ; j< num; j++) // 이칸의 나를 포함 나보다 위에있는 말을 내 규칙대로 옮김
+                {
+                    ht[y*n+ x][j].x = nx;
+                    ht[y*n+ x][j].y = ny;
+                    ht[y*n+ x][j].n= ht[ny*n +nx ].size();
+                    ht[ny*n +nx ].push_back(ht[y*n+ x][j]);
+                    
+                    h[ht[ny*n +nx ].back().num] = ht[ny*n +nx ].back();
+                    erase_cnt++;
+                }
+            }
+            
+            else if(color==red)   //반대로
+            {
+                // cout<<"with: ";
+                int buf = h[i].n;
+                for(int j= num-1  ; j>= buf; j--) // 이칸의 나를 포함 나보다 위에있는 말을 내 규칙대로 옮김
+                {
+                    ht[y*n+ x][j].x = nx;
+                    ht[y*n+ x][j].y = ny;
+                    ht[y*n+ x][j].n= ht[ny*n +nx ].size();
+                    ht[ny*n +nx ].push_back(ht[y*n+ x][j]);
+                    
+                    h[ht[ny*n +nx ].back().num] = ht[ny*n +nx ].back();
+                    erase_cnt++;
+                }
+
+            }
+            for(int j=0; j< erase_cnt; j++) ht[y*n+x].pop_back();
+    for(int i=0; i<n; i++){
+        for(int j=0; j<n; j++){
+            if (ht[i*n+j].size() >=4) 
+            {
+                end =1;
+                return;
+            }
+        }
+    }   
+
+
+           #if debug
+    cout<<"\n after move\n";
+    {
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+                cout<<ht[i*n+j].size()<<" ";
+            }
+                cout<<"\n";
+        }
+    }
+    cout<<"\n top horse \n";
+    {
+        for(int i=0; i<n; i++){
+            for(int j=0; j<n; j++){
+               if(ht[i*n+j].size() !=0) 
+                cout<<ht[i*n+j].back().num +1<<" ";
+                else
+                cout<<0<<" ";
+            }
+                cout<<"\n";
+        }
+    }
+
+```
+
+
+
 # 21.10.01 경사로 (14890)
 
 풀이정리
