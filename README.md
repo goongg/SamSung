@@ -855,7 +855,72 @@ for(int i=0; i<n; i++)
 
 
 
+# 21.09.26 연구소3_re (17142)
 
+풀이 정리
+
+**bfs** +  시뮬
+
+다시 풀어봄
+
+확실히 bfs 이해가 많이 부족했던 듯 // bfs 문제 많이 풀어봐야겠다 더
+
+-   바이러스 퍼트리는 함수 (bfs)
+
+  이전노드의 레벨을 기억하고 있다가, 다음으로 뻗어갈 때, 레벨을 +1 시켜주는 방식으로 시간을 구현했어야 함.
+
+  bfs에서 노드의 레벨이 이 문제에서는 그 칸에 퍼진 시간이라고 생각
+
+  전체 퍼진 시간의 경우, 0 인 곳으로 퍼진 시간중 최댓값을 찾으면 그게 최대 시간
+
+  추가로 모두 퍼졌는지를 체크할 때도, 루프를 돌 필요 없이, 원래 빈칸의 갯수를 기억했다가 빈칸의 갯수만큼 0으로 노드가 뻗어진 숫자를 비교하면 코드가 훨씬 라이트 해짐
+
+  ```c++
+     int spread(vector<int> selected)
+      {
+          vector<int> nt =t; //퍼진 후 멥
+          queue<int> q_vis;
+          vector<int> sp_t(n*n); //각 칸에 퍼진 시간을 기록
+          int spread_time=0;
+          int sp_area=0;
+          }
+  
+          while(!q_vis.empty())
+          {
+              int cur = q_vis.front();
+              q_vis.pop();
+              int x = cur%n;
+              int y = cur/n;
+  
+              for(int j=0; j<4 ;j++)//현재 위치를 기준으로 4방향 조사
+              {
+  
+                  int nx= x+dx[j];
+                  int ny= y+dy[j];
+  
+                  if(nx>=n || nx<0 || ny>=n || ny<0 ) continue; //큐에 넣을 필요 없는놈들
+                  if(nt[ny*n+nx]==1 || nt[ny*n+nx]==4) continue;
+  
+                  if(t[ny*n+nx]==0) sp_area++;    
+                  sp_t[ny*n+nx] = sp_t[cur]+1; // 이 칸에 최초로 퍼진 시간은, 이칸을 퍼트린 놈의 시간 +1 
+                  if( spread_time < sp_t[cur]+1  && t[ny*n+nx]==0 ) spread_time = sp_t[cur]+1 ;       
+  
+  
+                  // 저 조건들을 제외하면 0 또는 2(비 활성 바이러스) 
+                  nt[ny*n+nx] = 4; //활성 시켜주고
+                  q_vis.push(ny*n+nx); //다음에 여기서부터 뻗어가도록 추가
+              }
+          }
+      
+          if(sp_area == blac)
+              return spread_time;
+          else
+              return -1;
+  
+      }
+  ```
+
+  
 
 # 21.09.26 연구소3 (17142)
 
