@@ -6,6 +6,84 @@
 
 
 
+# 21.10.02 치킨배달 (15686)
+
+풀이정리
+
+input 값이 너무 작아서 엥간하면 시간초과 안남
+
+next_permutaion 을 써서 조합으로 치킨집을 뽑음
+
+
+
+
+
+- 1차원 배열에 치킨집 좌표, 집 좌표 넣음
+
+- 거리 계산
+
+  ```c++
+      int distance(int a, int b)
+      {
+          return abs(a%n -  b%n) + abs(a/n - b/n); 
+      }        
+  ```
+  
+- 선택된 치킨집을 넣었을때 치킨 거리를 계산해주는 함수
+  
+  집 루프 안에서 치킨집 루프를 돌림 집으로부터 선택된 치킨집 사이 거리를 계산해 최솟값을 저장
+
+```c++
+    int clac( vector<int> c)    //
+    {
+        int ret = 0;
+        for(int i :house)   //각 집에서 가장 가까운 치킨집을 찾음
+        {
+            int dis_min = 999999999;
+            for(int j : c)
+            {
+                if( distance(i, j) <dis_min) dis_min = distance(i, j) ;
+            }
+            ret += dis_min;
+        }
+        return ret;
+    }
+```
+
+- 치킨집 뽑기
+
+````c++
+   int sol()
+    {
+        input();
+        int min_ret=9999999;
+        vector<bool> combination;
+
+        for(int i=0; i<m; i++) combination.push_back(1);
+        while( combination.size() < chik.size() ) combination.push_back(0);
+        sort( combination.begin(),combination.end()); 
+        
+        do{
+            vector<int> buf;
+            int ret_buf;
+            for(int i=0; i< combination.size(); i++)
+            {
+                if(combination[i])
+                    buf.push_back(chik[i]);
+            }
+
+        ret_buf= clac(buf);
+        if( ret_buf < min_ret) min_ret = ret_buf;
+        buf.clear();
+        }while( next_permutation(combination.begin(), combination.end()));
+
+        return min_ret;
+    }
+````
+
+
+
+
 # 21.10.02 새로운 게임2 (17837)
 풀이정리
 쌩 쌩 시뮬 노가다
