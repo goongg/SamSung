@@ -4,7 +4,183 @@
 
 
 
-# 21.09.26 연구소3_re (17142)
+
+
+# 21.10.03 스타트 택시 (19238)
+
+풀이정리
+
+신경쓸게 참 많은 bfs + 시뮬 문제
+
+너무 조건을 다 고려해서 한번에 bfs를 짤라고 하지말고 모듈로 나눠서 중간 디버깅하면서 푸는게 날듯
+
+
+
+- **잘못된 풀이 전략**
+
+가장 거리가 짧은것을 찾고, 그 중에 가장 낮은 행을 찾고, 그 중에 가장 낮은 열을 찾을때,
+
+그냥 bfs를 위, 왼, 오른 ,아래 로 돌리면 알아서 찾아 질 꺼라 생각했다.
+
+왼 왼 왼
+
+오른 오른 위
+
+같은 반례가 있었고, bfs 에서 이런식으로 접근하는게 잘못된 발상인걸 알게됐음
+
+처음부터 문제 조건처럼 최단거리를 먼저찾고, 그중에 최저 행을 찾고, 그 이후, 최저 열을 찾도록 코드가 변경 하니 해결 됨
+
+
+
+- 거리를 찾는 함수 bfs
+
+  가장 기초적인 bfs 함수형태를 사용, 여기서 굳이 연료양을 계산하진 않음
+  
+  만약 그곳에 갈 수 없다면 -1 을 리턴 (벽에 막혀있거나 등)
+
+```c++
+    int search_min(int from, int to)
+    {
+        queue<int> q;
+        vector<bool> visit(n*n);
+        vector<int> dis(n*n);
+
+        q.push(from);
+        visit[from]= 1;
+
+        if(from == to) return 0;
+
+        while(!q.empty())
+        {
+            int cur= q.front();
+            q.pop();
+            //4방향 조사
+            for(int d=0; d<4; d++)
+            {
+                int nx= cur % n + dx[d];
+                int ny= cur / n + dy[d];
+
+                if( nx <0 || nx >=n || ny <0 || ny >=n ) continue;
+                if(t[ny*n + nx] ==1 || visit[ny*n + nx]) continue;
+                
+                visit[ny*n + nx]=1;
+                dis[ny*n + nx] = dis[cur] +1;
+                if(ny*n + nx == to )
+                    return dis[ny*n + nx];
+                
+                q.push(ny*n + nx);
+            }
+        }
+        return -1;
+    }
+
+```
+
+
+
+- 승객을 찾는 함수
+  1. 현재 위치에서 최단거리를 조사(위 함수 사용)
+  2. 최단거리 인 것중 최소 행을 조사
+  3. 최단거리 인 것중 최소 행 인것중 최소 열을 조사
+
+조건을 모두 만족하는 승객 위치로 이동하고, 연료량을 그 거리값만큼 뺌,
+
+만약 거리값이 음수가 된다면 -1 을 리턴
+
+```c++
+    int search_man()
+    {
+        int dis_min= 999999;
+        vector<int> dis_buf;
+        int min_x= 999999;
+        int min_y= 999999;
+        
+        vector<man> nmans;
+        //현재위치에서 승객과의 최소 거리 찾기
+        for(int j =0 ; j< mans.size(); j++)
+        {   
+            dis_buf.push_back( search_min(t_y*n + t_x,  mans[j].y*n + mans[j].x ) );
+            if(dis_buf.back() != -1 && dis_min > dis_buf.back() )
+                dis_min = dis_buf.back();
+            
+        }
+
+        for(int j =0 ; j< mans.size(); j++)
+            if(dis_buf[j] == dis_min)
+                if(min_y > mans[j].y) min_y= mans[j].y;
+
+        for(int j =0 ; j< mans.size(); j++)
+            if(dis_buf[j] == dis_min && min_y == mans[j].y)
+                if(min_x > mans[j].x) min_x= mans[j].x;
+
+        if(dis_min == 999999)   //모든 승객에게 도달할 수 없는 경우
+            return -1;
+        
+
+        //최단 거리 승객 중, 가장 행이 낮고 열이 낮은 승객 찾기     
+        for(int j =0 ; j< mans.size(); j++)
+        {
+            if(mans[j].x== min_x && mans[j].y==min_y && dis_buf[j]==dis_min)
+            {
+                next_dest= mans[j].d_y*n + mans[j].d_x;
+                t_x= mans[j].x;
+                t_y= mans[j].y;
+                fuel -= dis_min;
+            }
+            else
+                nmans.push_back(mans[j]);            
+        }
+        mans= nmans;
+
+if(fuel>=1)
+        return fuel;
+else
+        return -1;
+    }
+
+```
+
+
+
+- 목적지로 가는 함수
+
+```c++
+  int search_dest()
+    {
+        int dis_min= 999999;
+        int dis_buf;
+
+        //현재위치에서 목적지 까지 거리 찾기
+        dis_buf= search_min(t_y*n + t_x,  next_dest);
+        if(dis_buf ==-1 || fuel - dis_buf <0) return -1;
+        else
+            fuel += dis_buf;
+        t_x= next_dest % n;
+        t_y= next_dest / n;
+
+        return fuel;
+    }
+    int sol()
+    {
+        input();
+        int ret;
+        for(int i=0; i<m ;i++)
+        {
+            ret= search_man();
+            if(ret == -1) return -1;
+            ret= search_dest();
+            if(ret == -1) return -1;
+        }
+        return ret;
+    }
+
+```
+
+
+
+
+
+# 21.10.03 연구소3_re (17142)
 
 풀이 정리
 
