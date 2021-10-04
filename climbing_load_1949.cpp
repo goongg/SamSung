@@ -8,7 +8,6 @@ using namespace std;
 int dx[4]={-1, 0, 1, 0};
 int dy[4]={ 0, 1, 0, -1};
 
-
 class mount
 {
     int n, k;  
@@ -16,13 +15,16 @@ class mount
     vector<int> load_length;
     int dfs_max= -1;
     vector<int> map;
+    vector<int> init_map;
     public: 
     void input()
     {
         cin>>n>>k;
         map= vector<int>(n*n);
+        
         for(int i=0; i< n*n; i++) cin>>map[i];
         visit= vector<bool>(n*n);
+        init_map= map;
         load_length= vector<int>(n*n);
     }
     int search_load()   //가장 높은 봉우리를 찾아서 등산로를 결정하는 함수 /dfs
@@ -32,11 +34,11 @@ class mount
         int load_max = -1; // 가장 긴 등산로
 
         for(int i=0; i< n*n; i++)
-            if(high_max < map[i]) high_max = map[i];
+            if(high_max < init_map[i]) high_max = init_map[i];
 
         for(int i=0; i< n*n; i++)
         {
-            if(high_max  == map[i])
+            if(high_max  == init_map[i])
             {
                 highst.push_back(i);
                 // cout<< i<<" ";
@@ -123,7 +125,8 @@ class mount
                     // cout<<"\n------------------------------\n";
                     // cout<<kk<<" "<< i<<" "<< j<<endl;
                     map[i*n +j] -=kk;  //k만큼 깍은 맵
-                    ret = search_load(); // 그맵에서 결과 내기
+                    if(map[i*n +j] >=0)
+                    	ret = search_load(); // 그맵에서 결과 내기
                     map[i*n +j] += kk; //원상복귀
                     if(ret_max < ret) ret_max= ret;
                 }
@@ -133,6 +136,7 @@ class mount
     }
 
 };
+
 
 
 
