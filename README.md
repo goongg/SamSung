@@ -4,6 +4,148 @@
 
 
 
+# 21.10.04 등산로 조성
+
+풀이 정리
+
+평범한 dfs + 시뮬 문제인데 문제의 애매한 설명 때문에 시간을 너무 잡아먹음
+
+- 문제 설명 중 에바인점
+
+  - 등산로를 만드는 규칙은 다음과 같다.
+
+    ① 등산로는 가장 높은 봉우리에서 시작해야 한다.
+
+  -> 이거 진짜 개에바인게,, 가장 높은 봉우리를 깍은 경우에도 이 봉우리를 포함해서 등산로를 찾아야 함. 가장 높은 봉우리를 깍으면, 가장 높은 봉우리가 아니게 되는거 아닌가?
+
+  - 7. 필요한 경우 지형을 깎아 높이를 1보다 작게 만드는 것도 가능하다.
+
+    ->이것도 진짜 애매한게, 음수도 될수 있다는건지 제한이 있어야 했던것 아닌가..
+
+    음수면... 산이 아니게 되서 안되는거라 생각해야 하나
+
+
+
+- 가장 높은 봉우리를 찾고, dfs를  봉우리부터 시작하게 해주는 함수
+
+  dfs 시작 전에 시작하는 곳의 등산로 길이를 1로 설정
+
+  dfs 시작하기 전에 시작하는곳을 방문처리
+
+  ```c++
+     int search_load()   //가장 높은 봉우리를 찾아서 등산로를 결정하는 함수 /dfs
+      {
+          vector<int> highst; // 가장 높은 봉우리를 저장하는 벡터
+          int high_max= -1;
+          int load_max = -1; // 가장 긴 등산로
+  
+          for(int i=0; i< n*n; i++)
+              if(high_max < init_map[i]) high_max = init_map[i];
+  
+          for(int i=0; i< n*n; i++)
+          {
+              if(high_max  == init_map[i])
+                  highst.push_back(i);
+          }
+  
+          for(int i=0; i< highst.size(); i++)
+          {
+              for(int j=0; j<n*n; j++)
+                  visit[j]=0;
+  
+              for(int j=0; j<n*n; j++)
+                  load_length[j]=0;
+  
+              visit[highst[i]]=1;
+              load_length[highst[i]]=1;
+  
+              dfs_max = -1;       
+              int buf = dfs(highst[i]);
+              if(load_max< buf) load_max= buf;
+          }
+  
+          return load_max;
+      }
+  
+  ```
+
+
+
+- dfs
+
+  현재위치로부터 네방향 조사
+
+  다음 방향이 지금보다 작을 때, 노드에 추가
+
+  노드에 추가할 때는,  등산로의 길이 와 방문처리를 해주고 나간다
+
+```c++
+   int dfs(int cur)
+    {
+        int mmax= -1;
+        int buf;
+
+        for(int d=0 ; d<4 ; d++)
+        {
+            int x = cur % n;
+            int y = cur / n;
+            int nx = x +dx[d];
+            int ny = y +dy[d];
+
+            if( nx <0 || nx >=n || ny <0 || ny >=n) continue;
+            if( visit[ny*n + nx ]) continue;
+
+            if( map[ny*n + nx] < map[cur]  ) //다음이 더 작으면 노드 뻗기
+            {
+                load_length[ny*n + nx] = load_length[cur] + 1;
+                visit[ny*n + nx]=1;
+                if(dfs_max < load_length[ny*n + nx])
+                    dfs_max= load_length[ny*n + nx];
+
+                dfs(ny*n + nx);
+                visit[ny*n + nx]=0;
+                load_length[ny*n + nx] -= load_length[cur] + 1;
+            }
+        }
+        return dfs_max;
+    }
+```
+
+
+
+
+
+- 깍을 칸을 결정하는 부분
+
+```c++
+    int sol()
+    {
+        int ret;
+        int ret_max= -1;
+        input();
+
+        for(int kk= 1; kk<=k ; kk++)   //k 개만큼 깍으면서 구하기
+        {
+            for(int i=0; i< n; i++)
+            {
+                for(int j=0; j<n; j++)
+                {
+                    map[i*n +j] -=kk;  //k만큼 깍은 맵
+                    if(map[i*n +j] >=0)
+                    	ret = search_load(); // 그맵에서 결과 내기
+                    map[i*n +j] += kk; //원상복귀
+                    if(ret_max < ret) ret_max= ret;
+                }
+            }
+        }
+        return ret_max;
+    }
+```
+
+
+
+
+
 # 21.10.03 테트로미노 (14500)
 
 풀이정리
