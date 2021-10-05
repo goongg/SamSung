@@ -6,7 +6,157 @@
 
 
 
-# 21.10.04 나무재태크 (16235)
+# 21.10.06 상어 중학교 (21609)
+
+풀이정리
+
+진짜  조건이 너무너무 복잡한 시뮬 + dfs  
+
+나무재태크나 새 게임2 과 비슷한 유형인듯 시뮬의 단계의 구분이 아주 명확하고 
+
+조건이 엄청 많은 문제
+
+이런 종류의 문재들은 나중에 모아서 한번 더풀어봐야 할듯
+
++테케 다 맞추고 나서 제출 이후 디버깅 할때는 되도록 코드리뷰 측면에서 진행해야 에러를 찾는듯
+
+
+
+- dfs 를 써서 블록 그룹들을 만들고 배열에 저장하도록 짬
+- 문제의 단계가 명확한데, 단계별로 함수 구현 해서 각 단계별 디버깅 하자는 전략
+  1. dfs로 그룹핑을 하는 함수
+  2. 그룹중 파괴할 것을 찾아 파괴하는 함수
+  3. 중력을 가하는 함수
+  4. 90도 회전하는 함수
+
+
+
+
+
+- 그루핑을 하는 함수
+
+1. dfs 에서 사용할 전역 변수들을 초기화 
+
+2. dfs는 전체 칸들을 돌면서 방문 처리되지 않은, 일반 블록일때 시작
+
+`if( t[i*n +j] >0 && t[i*n +j] <=m && !visit[i*n+j]  )`
+
+3. dfs를 시작하기 전에 dfs안에서 사용할 전역변수를 초기화
+
+   Answer 역할을 할 dfs_ret 와, 노드를뻗을지 판단할 des_num
+
+4. dfs수행.
+
+   여기서 다른 문제와 다른건 방문 해제는 무지개 블록만 수행한다는 점이 다름
+
+   그리고 다른 dfs 전역변수들 초기화
+
+```c++
+
+    void search_group() //bfs
+    {
+
+        //한칸씩 돌면서 dfs를 수행.. 이미 그룹핑이 되어있는거면 노드 진행 안함
+        //돌면서 방문하지 않은 일반 블록이 나오면 dfs 시작
+        visit.clear();
+        visit.resize(n*n);
+        groups.clear();
+        groups.resize(0);
+
+        max_group_size=1;
+        end=1;
+        for(int i=0; i<n ; i++){
+            for(int j=0; j<n ; j++)
+            {
+                if( t[i*n +j] >0 && t[i*n +j] <=m && !visit[i*n+j]  )
+                {
+                    dfs_num= t[i*n +j];
+                    visit[ i*n +j] = 1;
+                    dfs_ret.clear();
+                    dfs_ret.resize(0);
+                    dfs_ret.push_back(i*n +j );
+                    dfs(i*n +j);
+
+                    if(dfs_ret.size() >= 2 )
+                    {
+                        end=0;
+                        groups.push_back(dfs_ret);
+                        if(max_group_size < dfs_ret.size())
+                            max_group_size = dfs_ret.size();
+               
+                    }
+                    for(int ii=0; ii<n*n; ii++)
+                        if(t[ii]==0) visit[ii]=0;
+
+                    dfs_ret.clear();
+                    dfs_ret.resize(0);
+                }
+            }
+        }
+    }
+
+```
+
+
+​    Dfs
+
+```c++
+    void dfs(int cur) // cur로 부터 주변에 자기와 같은 숫자가 있는지 체크 있다면
+    {
+        for(int i=0; i<4 ; i++)
+        {
+            int nx = cur%n + dx[i];
+            int ny = cur/n + dy[i];
+            int next = ny*n + nx;
+            if( nx<0 || nx>=n || ny<0 || ny>=n) continue;
+            if( t[next] == -1 ) continue;
+
+            if( ( t[next] == dfs_num || t[next] ==0 ) && !visit[next]) 
+            {
+
+                visit[next]= 1; //방문처리 하고
+                dfs_ret.push_back(next);
+                dfs(next);
+            }
+        }
+
+    }
+```
+
+
+
+- 위에서 생긴 groups 중 삭제할 groupd을 정하는 함수
+
+나무재태크와 동일한 방법으로 진행 했음. 하지만 나무재태크와 달리
+
+1회 수행이고, 아무리 많아봐야 배열의 갯수는 200을 넘기 힘들기 때문에 시간복잡도가 낮다고 판단. 그런데  코드가 진짜 너무 너무 길어짐
+
+​	 --> 이 부분을 다른사람들은 어떻게 구현했을지 궁금 코드 찾아보기
+
+```c++
+   int sol()
+    {
+        input();
+        while(!end)
+        {
+            search_group();
+            if(end) break;
+            delete_block();
+            gravity();
+            lotate();
+            gravity();
+        }
+        return score;
+
+    }
+```
+
+
+
+
+
+
+# 21.10.05 나무재태크 (16235)
 
 풀이정리
 
