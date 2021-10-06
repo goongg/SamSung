@@ -4,7 +4,185 @@
 
 
 
+# 21.10.07 감시 (15683)
 
+풀이정리
+
+간단한 완탐 + 시뮬
+
+
+
+- 특정 위치에서 방향으로 view 처리를 해주는 함수
+
+```c++
+    void view(int cur, int d)
+    {
+        int x= cur%m;
+        int y= cur/m;
+        int nx = x ;
+        int ny = y ;
+        // cout<<"view"<<endl;
+        while(1)
+        {
+            // cout <<d<<" ";
+            nx+= dx[d];
+            ny+= dy[d];
+            int next =  ny*m + nx;
+            if(nx <0 || nx>=m || ny<0 || ny >= n ) break;
+            if( t[next] == 6 ) break;
+            if(t[next] ==0) visit[next] = 1;
+        }
+        // cout<<endl;
+
+    }
+```
+
+
+
+
+
+- 입력된 방향대로 view 함수를 콜해서 사각지대를 게산하는 함수
+
+  int dx[4] = {-1, 0 ,1, 0};
+
+  int dy[4] = {0, -1, 0 ,1};
+
+  로 잡아두면 방향을 잡기가 편함
+
+  1의 경우에는 저 4개중 한 방향으로 돌리면 되고
+
+  2의 경우에는 저장된방향과 2차이나는 방향을 같이 돌려주면 됨
+
+  'view(cctv[i], cctv_d[i]);' //저장된 방향
+
+  'view(cctv[i], (cctv_d[i] +2 )%4 );' //저장된 방향과 반대 방향
+
+  
+
+  ```c++
+      int clac()
+      {
+          visit.clear();
+          visit.resize(n*m);
+          int ret=0;
+          for(int i=0; i< cctv.size() ;i++)
+          {
+              int cur= cctv[i];
+  
+              switch(t[cur])
+              {
+                  case 1:
+                      view(cctv[i],  cctv_d[i]);
+                      break;
+  
+                  case 2:
+                      view(cctv[i], cctv_d[i]);
+                      view(cctv[i], (cctv_d[i] +2 )%4 );
+                      break;
+  
+                  case 3:
+                      view(cctv[i], cctv_d[i]);
+                      view(cctv[i], (cctv_d[i] +1)%4 ) ;
+                      break;
+                  case 4:
+                      view(cctv[i], cctv_d[i]);
+                      view(cctv[i], (cctv_d[i] +1)%4 ) ;
+                      view(cctv[i], (cctv_d[i] +2)%4 ) ;
+                      break;
+                  case 5:
+                      view(cctv[i], cctv_d[i]);
+                      view(cctv[i], (cctv_d[i] +1)%4 ) ;
+                      view(cctv[i], (cctv_d[i] +2)%4 ) ;
+                      view(cctv[i], (cctv_d[i] +3)%4 ) ;
+                      break;
+              }
+          }
+          for(bool i: visit)
+              if(i) ret++;
+  
+          return ret;
+      }
+  ```
+
+  
+
+- Dfs
+
+  ```c++
+      int dfs_min=99999998;
+  
+      void dfs(int level)
+      {
+  
+          if(cctv.size() ==0) {
+              dfs_min= blac;
+              return;
+          }
+          if(level == cctv.size()) 
+          {
+              
+              int buf;
+              buf= blac- clac();
+  
+              #if debug
+              cout<<"dfs종료 방향들"<<endl;
+              for(int i: cctv_d)
+                  cout<<i<<" ";
+              cout<<"결과:"<<buf<<endl<<endl;
+              #endif
+  
+              if(buf < dfs_min) dfs_min= buf;
+  
+              return ;
+          }
+  
+          switch( t[cctv[level]] )
+          {
+  
+              case 1:     //네방향존재
+              for(int i=0; i<4; i++)
+              {    
+                  cctv_d[level] = i;
+                      dfs(level+1);                    
+              }
+              break;
+  
+              case 2: //두방향 존재
+                  for(int i=0; i<2; i++)
+                  {    
+                      cctv_d[level] = i;
+                          dfs(level+1);                    
+                  }
+              break;
+  
+              case 3: //네방향
+                for(int i=0; i<4; i++)
+                  {    
+                      cctv_d[level] = i;
+                          dfs(level+1);                    
+                  }
+              break;
+  
+              case 4: //네방향
+                  for(int i=0; i<4; i++)
+                  {    
+                      cctv_d[level] = i;
+                          dfs(level+1);                    
+                  }
+              break;
+  
+              case 5: //한방향
+                  cctv_d[level] = 0;
+                  dfs(level+1);                    
+              break;
+          }
+  
+  
+      }
+  
+  ```
+
+  
 
 # 21.10.06 상어 중학교 (21609)
 
