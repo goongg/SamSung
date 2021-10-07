@@ -4,6 +4,150 @@
 
 
 
+# 21.10.03 미세먼지 안녕! (17144)
+
+풀이정리 
+
+쌩 시뮬 노가다
+
+진짜 복잡하다. 다른문제에서도 그랬는데 회전하도록 루프 짤때, 경계값이 너무 헷갈린다. 다른사람은 이럴때 어떻게 짤지 비교해봐야겠다.
+
+시간조건도 엄청 널널헤서 그냥 시뮬만 잘 짜면 되는 문제
+
+
+
+- 퍼트리는 함수
+
+  ```c++
+      void spread()
+      {
+          vector<int> nt(n*m);
+          for(int i : dust)
+          {
+              int x = i%m;
+              int y = i/m;
+              int cnt=0;
+              for(int j=0; j<4; j++)//네방향 조사
+              {
+                  int nx= x+ u_dx[j];
+                  int ny= y+ u_dy[j];
+                  int next= ny*m +nx;
+                  if(nx < 0 || nx >=m || ny <0 || ny >=n) continue;
+                  if(t[next]==-1) continue;
+  
+                  cnt++;
+                  nt[next] += t[i]/5;    
+                  // cout<<t[i]<<endl;
+              }
+  
+              nt[i] -= (t[i]/5)*cnt;
+  
+          }
+          for(int i=0; i<n*m; i++)
+              if(t[i] !=-1) t[i] += nt[i];
+          
+  
+  ```
+
+  
+
+  - 바람 부는 함수
+  
+    다른사람 코드 중 직관적으로 잘짠거 찾아보기
+  
+```c++
+    int blow()
+    {
+        int ret=0;
+        int x = 0;
+
+        int up_y = cleaner[0]/m;
+        int down_y = cleaner[1]/m;
+
+        vector<int> nt(n*m);
+
+        nt[cleaner[0]]= -1;
+        nt[cleaner[1]]= -1;
+        
+        nt[up_y*m + 1] =0; 
+
+        for(int j= +1; j<m-1; j++)
+            nt[up_y*m + j+1] =t[up_y*m +j];
+
+        nt[(up_y-1)*m + m-1] = t[up_y*m + m-1];
+
+        for(int i=up_y-1; i>=1; i--)    //위 이동
+            nt[(i-1)*m + m-1]= t[i*m + m-1];
+
+        nt[(0)*m + m-2] = t[0*m + m-1];
+
+        for(int j= m-1; j>=1; j--)
+            nt[0*m + j-1] =t[0*m +j];
+
+
+        for(int i=0; i<= up_y -2 ; i++)    //위 이동
+            nt[(i+1)*m + 0]= t[i*m + 0];
+
+
+
+        nt[down_y*m + 1] =0; 
+
+        for(int j= 1; j<m-1; j++)
+            nt[down_y*m + j+1] =t[down_y*m +j];
+
+        nt[(down_y+1)*m + m-1] = t[down_y*m + m-1];
+
+        for(int i=down_y; i<n-1; i++)    //아래 이동
+            nt[(i+1)*m + m-1]= t[i*m + m-1];
+
+        nt[(n-1)*m + m-2] = t[(n-1)*m + m-1];
+
+        for(int j= m-1; j>=1; j--)
+            nt[(n-1)*m + j-1] =t[(n-1)*m +j];
+
+        for(int i=n-1; i> down_y +1 ; i--)    //위 이동
+            nt[(i-1)*m + 0]= t[i*m + 0];
+
+
+
+
+for(int i=1; i< up_y; i++)
+{
+    for(int j =1; j< m-1; j++)
+       nt[i*m+j] = t[i*m+j];
+}
+
+for(int i=down_y+1; i< n-1; i++)
+{
+    for(int j =1; j< m-1; j++)
+       nt[i*m+j] = t[i*m+j];
+}
+
+
+t= nt;
+
+dust.clear();
+dust.resize(0);
+for(int i =0; i<n*m; i++)
+if( t[i] !=0 && t[i] != -1) dust.push_back(i);
+
+
+
+   for(int i=0; i<n*m; i++)
+    {
+        if( nt[i] != -1)
+            ret += nt[i];
+    }
+
+    return ret;
+
+}
+```
+
+​    
+
+
+
 # 21.10.07 감시 (15683)
 
 풀이정리
