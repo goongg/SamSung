@@ -4,6 +4,91 @@
 
 
 
+# 22.0323 메뉴 리뉴얼
+
+풀이정리
+
+map vector sort permutatiom 다쓰는 좋은 문제
+
+c++ 알고리즘을 복습하고 싶으면 무조건 찾아서 다시 풀어봐야 할 문제
+
+- 모든 조합의 갯수를 찾는 함수 (Permutation)
+
+  ~~~c++
+          sel.clear();
+          for(char c : s)
+          {
+              if(course > i)    //선택해야하는 코스 갯수만큼 1
+                  sel.push_back(1);
+              else
+                  sel.push_back(0);
+              i++;
+          }
+          sort(sel.begin(), sel.end());
+  
+          cout<< idx <<"의 조합: ";
+          do
+          {
+              string buf;
+              buf.clear();
+              for(int j=0; j< s.size(); j++)
+                  if(sel[j])
+                      buf.push_back(s[j]);
+              
+              all_combi.push_back(buf);
+              cout << all_combi.back()<<" ";
+          } while (next_permutation(sel.begin(), sel.end()));
+  ~~~
+
+- 모든 조합에서 map 을 활용 그 조합이 나온 갯수를 세고, 최고 많이나온 횟수를 찾아 답에 추가
+
+  ~~~c++
+  vector<string> solution(vector<string> orders, vector<int> course) {
+      vector<string> answer;
+  
+      
+      vector<string> odrers_sorted;
+      for(string s: orders)
+      {
+          sort(s.begin(), s.end());
+          odrers_sorted.push_back(s);
+      }
+      map <string, int> m;
+      vector<string> buf;    
+      
+      for(int i : course)
+          search_comination(odrers_sorted,i);
+      
+  int MaxOder[1000]; //각 코스별 최대 사이즈
+  memset(MaxOder, -1, 1000);
+  
+      for (string s :all_combi)
+      {
+          if(m.find(s) == m.end())
+              m[s]=1;
+          else
+              m[s]= m[s]+1;
+  
+          if(MaxOder[s.size()]< m[s]) MaxOder[s.size()] =m[s];
+      }
+  
+      for (string s :all_combi)
+      {
+          if(m[s]>=2 && MaxOder[s.size()] == m[s])
+          {
+              answer.push_back(s);
+          }
+      }
+      
+      sort(answer.begin(), answer.end());
+      answer.erase( unique(answer.begin(), answer.end()), answer.end()) ;
+  return answer;
+  
+  }
+  ~~~
+
+  
+
 # 21.10.03 미세먼지 안녕! (17144)
 
 풀이정리 
