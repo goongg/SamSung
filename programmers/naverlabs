@@ -1,0 +1,187 @@
+#include <string>
+#include <vector>
+#include <map>
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+
+string solution(int num, vector<string> markets) {
+    string answer = "";
+vector<int> time_sec; 
+vector<int> val;
+vector<int> val_dif;
+int five_percent;
+int last_time;    
+    for(string s: markets)
+    {
+        string hh,mm,ss, vv;
+
+        hh+=s[0]; hh+=s[1];
+        mm+=s[3]; mm+=s[4];
+        ss+=s[6]; ss+=s[7];
+        vv= s.substr(8, s.size()-8);
+        time_sec.push_back( stoi(hh)*3600+ stoi(mm)*60 + stoi(ss) );
+        val.push_back(stoi(vv));
+    }
+
+      five_percent= (num *5)/100; 
+      last_time = 3600*14 + 60*50;
+                int result_time=0;
+                int H, M, S;
+
+
+   for(int i=0; i< val.size(); i++){
+       val_dif.push_back( abs(val[i] -num) );
+       // cout<< val_dif[i]<<endl;
+   }   
+      // cout<<"오퍼"<<five_percent<<endl;
+    for(int i=0; i< val_dif.size() ; i++)
+    {
+        if(val_dif[i]>= five_percent)
+        {
+            // cout<<"이떄 넘겼네 "<<i <<" "<<val_dif[i]<<endl;
+            int cur_time= time_sec[i];
+            int end_time= time_sec[i+1];
+            for(int j=1; i+j< val_dif.size(); j++)  // 이게 유지되는 시간을 찾어
+            {
+                if(val_dif[i+j] >= five_percent)
+                {    end_time= time_sec[i+1+j];
+                    // cout<< i+j<<endl;
+                    // cout<<time_sec[i+1+j]<<"end 시간갱신"<<val_dif[i+j]<<endl;
+                } 
+                else
+                    break;
+            }
+
+            if( end_time - cur_time >=60)
+            {
+                // cout<<"조건 찾음 끝시간은" <<end_time <<"지표는"<<val_dif[i]<<endl;
+                string hhh, mmm, sss;
+                result_time=time_sec[i]+60;
+                if(result_time >=last_time)
+                   return "not activated";
+
+                    H= result_time/3600;
+                    result_time-=H*3600;
+                    M= result_time/60;
+                    result_time-= M*60;
+                    S=result_time;
+
+                    hhh=to_string(H);        
+                    mmm=to_string(M);
+                    sss=to_string(S);
+
+                    if ( hhh.size() !=2) hhh.insert(0,"0");
+
+                    if ( mmm.size() !=2)  mmm.insert(0,"0");
+
+                    if ( sss.size() !=2) sss.insert(0,"0");
+
+                    answer= hhh+":"+mmm+":"+sss;
+
+                    return answer;               
+            }
+
+        }
+    }
+
+    answer = "not activated";
+
+    return answer;
+}
+
+
+#include <string>
+#include <map>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+map<char, int> m;
+static bool check[400];
+static int cnt[400];
+string solution(string s)
+{
+    string answer;
+    string buf;
+    for(char ch: s)
+    {
+        char c;
+        if(ch >='A' && ch <= 'Z' )
+            c = (char)(ch+32);
+        else
+            c= ch;
+
+            cnt[(int)c]++;
+            m[c]= cnt[(int)c];
+            // cout<< (int)c<<endl;
+
+    }
+    int mmax=-1000;
+    for( pair<char, int> p :m )
+    {
+        if(p.second>=mmax)
+            mmax=p.second;
+    }
+
+    for( pair<char, int> p :m )
+    {
+        if(p.second==mmax)
+            answer+=p.first;
+    }
+sort(answer.begin(), answer.end());
+
+    return answer;
+}
+
+
+#include <string>
+#include <vector>
+#include <iostream>
+using namespace std;
+
+
+int distance(vector<int> target, vector<vector<int>> positions) {
+
+    int ret=0;
+    int temp;
+    vector<int> target_power;
+    vector<int> posit_power;
+int dis=0;
+    for(int t: target)
+    {
+        dis+=t;
+        target_power.push_back(dis*dis);   
+        // cout<< target_power.back()<<endl;;    
+    }
+
+    for(vector<int> vp: positions )
+    {    posit_power.push_back( vp[0]*vp[0]  +vp[1]*vp[1]);
+        // cout<< posit_power.back()<<endl;; 
+    }
+    for (int i=0; i< posit_power.size(); i++)
+    {
+        for(int j=0; j< target_power.size(); j++)
+        {
+            if( posit_power[i]  <= target_power[j])
+            {    
+                // cout<<"영역"<<j <<"+"<< 10-j*2<<endl;
+                temp += 10-j*2;    
+                ret+=temp;
+                temp=0;
+                break;
+            }
+        }
+    }
+
+
+return ret;
+}
+
+
+int solution(vector<int> target, vector<vector<int>> positions) {
+    int answer = 0;
+    answer = distance( target,positions);
+    return answer;
+}
