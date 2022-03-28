@@ -40,7 +40,7 @@ Sort 는 많이썼으니까. 역방향 sort (아직 역방향 소트 문제를 �
 
 ​    answer.erase( unique(answer.begin(), answer.end()), answer.end()) ;
 
-
+ --> 중요한게 이거 중복삭제 제대로 할라면 sort쓰고 해야함 ㅋ
 
 # 풀이 아이디어 정리
 
