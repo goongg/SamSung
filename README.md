@@ -2,7 +2,105 @@
 
 [TOC]
 
+# 22.0423 줄기세포배양
+풀이정리
 
+테이블의 갯수가 정해져 있지 않은 새로운 유형
+100% 시뮬 문제로, 탐색 알고리즘 개념은 없음
+cell 위치를 vector에 넣어놓고 1시간이 지날때마다, push back 하기
+
+
+- #define zero 200
+
+테이블을 이런식으로 설정하면, 0,0을 기준으로 퍼지는 무한 크기의 테이블을 작성할 수 있음.
+
+~~~c++
+bool visit[2*zero +1][2*zero +1];
+int power[zero*2+1][zero*2+1]; // 400, 400을 0,0으로 약속
+int state[zero*2+1][zero*2+1]; // 400, 400을 0,0으로 약속
+int max[zero*2+1][zero*2+1]; // 400, 400을 0,0으로 약속
+~~~
+
+~~~c++
+  void TimeGo()
+    {
+        K--;
+        vector<cell> new_cells;
+        vector<cell> live_cells;
+        vector<int> new_power;
+        int cell_idx=0;
+        for(int i=0; i< cells.size(); i++)
+        {
+            int x = cells[i].x;
+            int y = cells[i].y;
+            if( state[x][y]<0 ) // 비 활성화 된 세포라면,
+            {
+                state[x][y]++; //상태하나 늘림
+                if( state[x][y] != power[x][y]);
+                live_cells.push_back(cells[i]);
+            }
+
+            else if( state[x][y] >=0 && state[x][y] < power[x][y]) //활성화 된 세포라면
+            {
+                state[x][y]++; //상태하나 늘림
+                if(state[x][y] != power[x][y])
+                    live_cells.push_back(cells[i]);
+                for(int d=0; d<4; d++) //네방향으로 퍼트림
+                {
+                    int nx= x + dx[d];
+                    int ny= y + dy[d];
+
+                    if(power[nx][ny] == 0) // 아직 안퍼진 곳이면?
+                    {
+                        cell cc;
+                        cc.x= nx;
+                        cc.y= ny;
+                        if(!visit[nx][ny])
+                        {
+                            new_cells.push_back(cc);
+                            new_power.push_back(power[x][y]);
+                            visit[nx][ny]=1;
+                        }
+                        else 
+                        {
+                            for(int ii=0; ii<new_cells.size(); ii++)
+                            {
+                                if(nx== new_cells[ii].x && ny==new_cells[ii].y)
+                                {
+                                    if(new_power[ii] < power[x][y])
+                                        new_power[ii] = power[x][y];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else    //아무것도 안함
+            {
+                // cout<<"dead:"<<x -zero <<" " << y -zero<<endl;
+
+                continue;
+            }
+        }
+        cells.resize(0);
+      //  cout<<K<<"-------------------\n";
+        int iiii=0;
+        for(cell ccc: new_cells)
+        {
+
+            cells.push_back(ccc);
+            power[ccc.x][ccc.y] = new_power[iiii++];
+            state[ccc.x][ccc.y] = power[ccc.x][ccc.y] * (-1);
+        }
+        for(cell ccc: live_cells)
+        {
+            cells.push_back(ccc);
+
+        }
+        
+    }
+
+~~~
 
 # 22.0323 메뉴 리뉴얼
 

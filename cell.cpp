@@ -3,7 +3,7 @@
 #include <map>
 using namespace std;
 
-#define zero 800
+#define zero 200
 
 struct cell { 
     public:
@@ -34,13 +34,12 @@ int max[zero*2+1][zero*2+1]; // 400, 400을 0,0으로 약속
         {
             cin>>init[i];
             cell c;
-            c.x =  i%M+zero;
-            c.y =  i/M+zero;
+            c.x =  i%M + zero;
+            c.y =  i/M + zero;
             if(init[i]!=0)
                 cells.push_back(c);
             power[ c.x ][c.y ] =  init[i];  
             state[ c.x ][c.y ] =  init[i] * (-1);
-        
         
         }
     }
