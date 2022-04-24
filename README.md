@@ -2,6 +2,94 @@
 
 [TOC]
 
+# 22.04 23 벽돌 깨기
+풀이정리
+현시점 dfs + 시뮬 연습용으로 거이 제일 좋은 문제라고 생각
+
+- 순열 개념 (중복순열, 순열)
+   W개중 N 개를 순서를 고려해서 뽑아야 하는 문제
+
+   조합이나, 순서섞이는 next_permutation이 편할수 있지만
+   순열은 재귀개념이 확실히 편할것 같음
+
+
+~~~c++
+        void  permutation( vector<bool> visit, vector<int> arr)
+        {
+            if(arr.size() == N)
+            {
+                selected.push_back(arr);
+                return;
+            }
+
+            for(int i = 0; i<W; i++)
+            {
+                arr.push_back(i);
+                permutation(visit, arr);
+                arr.pop_back();
+            }
+        }
+~~~
+dfs 는 기본적으로 코드가 심플함
+
+기계적으로 dfs짤 수 있도록 반복 숙달 되야하고, 중요한 정보는
+
+1. 어떻게 뻗을지 : 조건문
+2. 방문처리 어떻게 할지: visit 을 쓸지, 아니면 t에 바로 체킹할지
+3. end조건을 어떻게할지? : 이건 depth가 정해져 있는거면 필요하고, 아니면 안필요
+4. back tracking을 어떻게 할지 : 조건이 큰지 먼저 체크해야함
+
+
+dfs: 폭발 구현
+
+여기서 맵 자체에 0을 처리해서 방문조건을 처리했음.
+
+중요한게 dfs하다보면, 방문처리를 안에서 dfs하기전에 처리 하는게 편할지
+
+dfs안에서 처리하는게 편할지, 나뉘는데 이 경우, 맵자체가 방문처리도구로 사용되고
+
+맵의 정보를 이용해야해서 dfs안에서 처리하도록 했음.
+
+
++ 라인으로 쭉 퍼져서 원하는 지점까지 찾아낼때, 실수 많이한다.
++ 현재정보초기화 -> 반복문안에서 ++ 처리 하도록 해야함
++ 그리고 제일중요한게 index 이중배열로 하는게 편할수있다는거 무조건 인식해야함.
++ 처음에 풀때 쉬워보였는데 복잡하게 오래걸린이유가 1중배열을 써서그런것 같음.
++ 시험전에 dfs, 순열 연습할겸 다시한번 풀어보면 좋은문제
+
+~~~c++
+        void dfs(int x, int y)
+        {
+            int range = t[y][x];
+            t[y][x]=0; //방문처리 역할도 겸
+            if(range ==1) return;
+
+            for(int d=0; d< 4; d++)
+            {
+                int nx= x;
+                int ny= y;
+                for(int r=1; r< range; r++)
+                {
+                    ny += dy[d];
+                    nx += dx[d];
+
+                    if(nx >= W || ny >= H || nx <0 || ny<0) break;
+                    if( t[ny][nx]>1)
+                    {
+                        dfs(nx, ny);
+                    }
+                    else if( t[ny][nx] ==1)
+                    {
+                        t[ny][nx]=0;
+                        continue;
+                    }
+                    else if( t[ny][nx] ==0)
+                    continue;                            
+                }        
+            }
+        }
+~~~
+
 
 
 # 22.0423 핀볼 게임
