@@ -2,6 +2,135 @@
 
 [TOC]
 
+
+
+# 22.04 27 주사위굴리기2
+풀이정리
+x, y 너무 헷갈린데, r, c라고 쓰면 절대 안헷갈리는것 같음.
+
+반드시 아래와 같이 풀도록 연습.
+
+그리고 문제를 보면 탐색순서를 정할 수 있을 때가 있는데, 
+
+보통 U R D L 이런식으로 define을 정의해놓으면 편하게 풀 수 있을것 같음
+~~~c++
+int dr[4]={-1, 0, 1, 0};
+int dc[4]={0, 1, 0, -1};
+
+#define U 0
+#define R 1
+#define D 2
+#define L 3
+~~~
+
+주사위를 굴리는 함수
+
+단독 객체를 사용해서 풀음.
+
+여기서  int s[6] = {1, 5, 6, 2, 4, 3};  이코드 절대 안됨.
+
+앞으로는 풀때 주의 필요. 저렇게 반드시 선언해야 한다면, 완전히 전역으로 
+
+처리하던지 input에서 초기화 하던지 선택.
+
+
+~~~c++
+class Dice{
+
+    public:
+    int r =0;
+    int c = 0;
+    int s[6] = {1, 5, 6, 2, 4, 3}; //하늘, 앞옆 , 바닥, 뒷옆, 왼옆 우옆
+    int d =R;
+    void move()
+    {
+
+        int buf = s[0];
+        r+=dr[d];
+        c+=dc[d];
+        //3  0 1 2 3  간 순환
+        if(d==U) {
+            s[0] = s[1]; s[1] = s[2]; s[2]=s[3]; s[3]=buf; 
+        }
+        // 4 0 5 2 4  순환
+        if(d==R){ 
+            s[0] = s[4]; s[4] = s[2]; s[2]=s[5]; s[5]=buf;
+        }
+        if(d==D){ 
+            s[0] = s[3]; s[3] = s[2]; s[2]=s[1]; s[1]=buf;
+        }
+        if(d==L){
+            s[0] = s[5]; s[5] = s[2]; s[2]=s[4]; s[4]=buf;
+        }
+        return;
+    }
+    void print()
+    {
+        cout<<"\ndice\n";
+        cout<<"  " << s[3] <<"  " <<endl;
+        cout<<s[4]<<" " << s[0]<<" " <<s[5] <<endl;
+        cout<<"  "<< s[1] <<"  " <<endl;
+        cout<<"  "<< s[2] <<"  " <<endl;
+        return;
+    }
+};
+
+
+
+그리고 간단한 bfs인데 너무 오래걸린다. dfs / bfs 연습은 꾸준히 해야할듯
+
+이건 bfs로 풀필요는 없을것 같음 dfs가 훨씬 빨리풀렸음 실재로.
+
+왜냐면, 최단거리 찾는문제가 아니라서 그래.
+
+그리고 최단거리라고 하더라도 dfs로 back traking 치는게 낫지 않을까 싶기도  한데, 모르겠다 노력하자
+
+
+~~~c++
+  void bfs(int r, int c)
+    {
+        if(visit[r][c]) 
+            return; //이미 방문한 곳이면 바로 나오기
+        
+        visit[r][c]=1;
+        _pos p;
+        p.r = r; p.c = c;
+        queue<_pos> q;
+        q.push(p);
+        vector<_pos> v;//찾은 인접면을 임시저장
+        v.push_back(p);
+
+        int area=1;
+
+        while(!q.empty())
+        {
+            p= q.front();
+            q.pop();
+            for(int d=0; d< 4 ; d++)
+            {
+                _pos np;
+                np.r = p.r+ dr[d]; np.c= p.c +dc[d];
+                if(np.r <0 || np.r >= N || np.c <0 || np.c >=M) continue;
+                if(visit[np.r][np.c]) continue;
+
+                if(t[r][c] == t[np.r][np.c] ) 
+                {
+                    v.push_back(np);
+                    q.push(np);
+                    visit[np.r][np.c] =true;
+                    area++;
+                }
+            }
+        }
+        for(int i=0; i< v.size(); i++) point[v[i].r][v[i].c] = t[r][c]*v.size();
+    
+        return;
+    }
+
+~~~
+
+
+
 # 22.04 23 벽돌 깨기
 풀이정리
 현시점 dfs + 시뮬 연습용으로 거이 제일 좋은 문제라고 생각
