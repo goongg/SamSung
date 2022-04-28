@@ -144,15 +144,9 @@ public:
             return;
         }
 
-        // cout<<core_idx<<"연결체크! 현재 길이:" <<length;
-        // print();
-
-
         if(connected[core_idx]) 
         {
-            // cout<<"core" <<core_idx<<"is already coneeceted\n\n\n";
-            dfs(core_idx+1, length);
-        
+            dfs(core_idx+1, length);        
             return;
         }
 
