@@ -2,6 +2,164 @@
 
 [TOC]
 
+# 22.04 28 마법사상어와 복제
+풀이정리
+
+어려웠다. 어려운 문제였고, 이번 시험은 이것보다 어려울 수 있다. 노력하자.
+
+이번시험에서 가장 중요한점은 두가지였다.
+1) 중간디버깅
+2) 코드 리뷰
+
+지난 시험에서 중간디버깅의 중요성을 강조했는데, 이번 시험에서는 중간디버깅을 했음에도, 코드에 버그가 있어서 최종 디버깅이 1시간이상 걸려서 3시간안에 겨우겨우 풀었다.
+
+3시간안에 겨우푼문제가 이거랑, 새로운게임, 나무재태크 등 정도가 기억나는데
+
+이런문제를 풀때는 조건과 예외처리가 복잡하기 때문에 함수 하나 단위로 한줄한줄 코드리뷰를 해야할것 같다.
+
+~~~c++
+자료구조와 map 세팅
+  void input()
+    {
+        KillCnt=0;
+        cin>> M >>S;
+        for(int i=0; i< M; i++)
+        {
+            Fish f;
+            cin>>f.r>>f.c>>f.d;
+            f.d--;
+            f.r--;
+            f.c--;
+            t[f.r][f.c].push_back(f);
+        }
+        cin>>shark.r>>shark.c;
+        shark.r--;
+        shark.c--;        
+        for(int i=0; i<4 ;i++)
+        {
+            for(int j=0; j<4; j++)
+                smell[i][j]=0;
+        }
+    };
+
+~~~
+
+나는 저렇게 했는데 이제보니까 간단한 fish나 shark 같은경우는 struct가 낫겠다 싶다.
+struct이렇게 초기화 할 수 있는거 확인했으니 다음엔 활용할 수 있으면 활용하자. 근데 기본적으로 나쁘진 않은듯 
+- fish f = {x, y, d}; 
+
+
+- 물고기 이동!
+  분명 쉬운함수이고 빠르게 구현했지만 큰 에러가 있었다.
+
+  방향을 돌려가면서 결정하는 상황을 고려했지만,
+  
+  모든 방향을 돌아도 움직이지 못하는 경우를 면밀히 보지못햇다.
+
+  항상 가능한 모든 케이스에 대해서 고민을 한번은 해보고 넘어가야 한다.
+
+  여덟방향으로 체크를 할떄 시작과 끝조건을 잘 생각해야 함.
+
+  ~~~c++
+      void fish_move()
+    {
+        for(int i=0; i<4; i++)
+        {
+            for(int j=0; j<4; j++)
+            {
+                for(int ff =0; ff< t[i][j].size(); ff++)
+                {
+                    Fish f = (t[i][j])[ff];
+                    int nr = f.r;
+                    int nc = f.c;
+                    int nd = f.d;
+                    int cnt=0;
+                    do{
+                        cnt++;
+                        nr = f.r + dr[nd];
+                        nc = f.c + dc[nd];
+                        if(nc <0 || nr <0 || nc>=4 || nr >=4 || smell[nr][nc] !=0 || (nr == shark.r && nc==shark.c) )  
+                        {
+                            nd= (nd-1 +8)%8;
+                            if(nd == f.d) 
+                            {
+                               nt[f.r][f.c].push_back(f);
+                               break;
+                            }
+                            continue;
+                        }     
+                    f.r =nr;
+                    f.c= nc;
+                    f.d= nd;
+                    nt[nr][nc].push_back(f);
+                    break;
+                    }while(1);
+                }
+            }
+        }
+  ~~~
+
+
+- dfs 함수
+  다른사람이 푼거 보니까 브루트 포스도 괜찮았겠더라.
+
+  왜냐면 1회 이동은 3이고, 경우는 4씩 4^3; 총 64의 케이스를
+
+  100번 중복해서 뽑으면 (2^6)^6 = 2^36 쫌크긴큰가 근데 걍 dfs도 괜찮았음
+
+  근데 맵이 워낙 많다보니까, 초기화 해줄께 너무 많아서 복잡한것 뿐
+
+~~~c++
+map을 다양하게 설정하는 아이디어는 상당히 중요한듯, 그리고 이런문제 이차원 배열로 안했거나 y x를 썼으면 헷갈려서 못풀었을듯, 방식을 바꾼건 잘한것 같고, 이방식으로 새로운게임도 다시 풀어봐야겠다.
+
+void dfs()
+    {
+
+        if(move_way.size()==3)
+        {
+            if( KillCnt >= max_kill)
+                max_kill = KillCnt;
+
+            answer_kill.push_back(KillCnt);
+            answer.push_back(move_way);
+
+            return;
+        }
+
+
+        int r= shark.r;
+        int c = shark.c;
+        for(int d=0; d<=6; d+=2) //네방향조사 
+        {
+
+            int nr= r + dr[d];
+            int nc= c + dc[d];
+            if(nc <0 || nr <0 || nc>=4 || nr >=4 )  continue;
+            
+            //임시저장
+            vector<Fish> buf = nt[nr][nc];
+            int buf_kill = KillCnt;
+            int buf_smell = smell[nr][nc];
+
+            KillCnt += nt[nr][nc].size();   //잡아먹은거 증가
+            move_way.push_back(d);  //이동 자취 남김
+            nt[nr][nc].clear();     //먹었으니 없어지고
+            shark.r= nr; shark.c=nc;
+
+            dfs();
+
+            KillCnt = buf_kill;
+            nt[nr][nc]= buf;
+            move_way.pop_back();
+            shark.r= r; shark.c=c;
+            visit[nr][nc] =0;
+        }₩
+
+    };
+
+~~~
+
+
 # 22.04. 27 프로세서 연결하기
 풀이정리
 풀이방법을 정확하게 정리하고 들어가면 1시간반컷 가능하다. 
