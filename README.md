@@ -2,6 +2,110 @@
 
 [TOC]
 
+# 22.04. 27 프로세서 연결하기
+풀이정리
+풀이방법을 정확하게 정리하고 들어가면 1시간반컷 가능하다. 
+
+이정도 문제는 중간디버깅중요하고, 초기화 조건을 잘생각해야 함.
+
+- dfs를 효율적으로 짤 수있게 하는 판단 함수, 초기화 함수를 설계하면,
+- 중간디버깅이 쉬워지고 논리가 간단해짐.
+- 한라인 쭉 검사하는거 while문도 괜찮은것 같음.
+
+~~~c++
+    //이방향으로연결가능한지정의
+    bool check(int idx, int d)
+    {
+        _pos next= cores[idx];
+        while(1)
+        {
+            next.r += dr[d];
+            next.c += dc[d];
+
+            if(next.r<0 || next.c <0 || next.r >=N|| next.c>=N)
+                return 1;
+            
+            if(visit[next.r][next.c] ==1)
+                return 0;
+        }
+    }
+
+~~~
+
+~~~c++
+    int connect(int idx, int d)
+    {
+        int result=0;
+        _pos next = cores[idx];
+        while(1)
+        {
+            next.r += dr[d];
+            next.c += dc[d];
+
+            if(next.r<0 || next.c <0 || next.r >=N|| next.c>=N)
+                return result;
+
+            visit[next.r][next.c ] = !visit[next.r][next.c];
+            result++;
+        }
+    }
+~~~
+
+
+- dfs의 경우, 원하는 depth에 도달했을때, return 때리고 이때의 결과를 저장
+- 만약에 depth까지의 경로가 필요한 문제가 있어도 이런식으로 answer를 설계.
+  
+~~~c++
+ void dfs(int core_idx, int length)
+    {
+        int cur_length;
+        if(core_idx == cores.size())
+        {
+            int con=0;
+            answer_length.push_back(length);
+
+            for(int i=0; i< connected.size(); i++)
+                if(connected[i]==1) con++;
+
+            answer_connected.push_back( con);
+
+            if(max_answer_connected < con)
+                max_answer_connected= con;
+            
+            return;
+        }
+
+        if(connected[core_idx]) 
+        {
+            dfs(core_idx+1, length);        
+            return;
+        }
+
+        for(int i=0; i<5; i++)
+        {   
+            if(i==4)
+                dfs(core_idx+1, length);
+            else
+            {    
+                if(check(core_idx, i))  //이을수 있으면
+                {
+                    int plus_length = connect(core_idx, i); //그방향으로 잇고
+                    connected[core_idx] =1;    //이 코어가 연결됐음을 기록.
+                    // print();
+                    // cout<<i<<"방향으로 연결! 추가길이: "<<plus_length <<endl<<endl;
+                    
+
+                    dfs(core_idx+1, length+plus_length);
+                    connected[core_idx] =0;    //초기화
+                    connect(core_idx, i);
+                }
+            }
+        }
+
+    };
+~~~
+
+
 
 
 # 22.04 27 주사위굴리기2
