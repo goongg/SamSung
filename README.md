@@ -2,6 +2,93 @@
 
 [TOC]
 
+
+
+
+
+# 22.04 29 마법사상어와 파이어스톰
+풀이정리
+
+어렵다. 시험은 이것보다 더 어려울거다. 집중하고, 개념을 정리하자.
+
+이문제는 이 간단한 코드가 어려웠고 오래걸렸다.
+
+결국에 생각을 잘 못하겠어서 0,0으로 평행이동해서 풀었다.
+
+한번에 헷갈리고 어려운걸 구현해내려고 시간을 쓰는것 보다, 생각을 심플하게 할 수 있도록 해놓고 보고 개선하는게 좋을 수 있음.
+
+특히 회전과 관련된 문제는 옮길 map을 따로 배열로 두고, 0,0을 기준으로 회전한다고 생각하면  쉬울수 있음.
+
+
+~~~c++
+    void rotate(int r, int c, int l)
+    {
+        int len = 1;
+        for(int i=0 ; i<l; i++)
+            len*=2;
+
+        int nt[64][64];
+        int tt[64][64];
+
+        for(int i=r; i<r+ len ; i++)
+            for(int j=c; j<c +len ; j++ )
+                tt[i-r][j-c] = t[i][j];
+
+
+        for(int i=0; i<len ; i++){
+            for(int j=0; j<len ; j++ )
+                nt[j][len-1 -i] = tt[i][j];
+        }
+
+
+        for(int i=0; i< len ; i++)
+            for(int j=0; j<len ; j++ )
+                t[i+r][j+c] = nt[i][j];
+    }
+~~~
+
+dfs는 실력이 올랐다고 생각하는데 여전히 불안하다.
+
+중요한 개념은 방문체크를 하는냐 안하느냐인데, 다른 노드에 의해 침범을 허용할 것인지, 
+
+아닌지를 기준으로 판단해야함. 예를들어 마법사상어와 복제처럼, 경로를 찾는 문제의 경우는, 시작 노드가 뭐냐에 따라서 해당노드를 다시 방문할 일이 있을수 있지만,
+
+이문제의 경우 한번만 노드에 들어오면, 이 노드는 절대로 다시 들어올 일이 없기 떄문에, 초기화를 해주지 않아도 되는거임.
+
+알겠는데, 연습 더 해보기
+
+
+~~~c++
+    for(int i =0 ; i<M; i++)
+        for(int j=0; j< M; j++)
+        {   
+            if(t[i][j] ==0) continue;
+            if(visit[i][j]) continue;
+            visit[i][j] =1;
+            size=1;
+            dfs(i,j);  
+            if(max < size) max = size;
+        }
+
+    void dfs(int r, int c)
+    {
+        for(int d=0; d <4 ; d++)
+        {
+            int nr= r + dr[d];
+            int nc= c + dc[d];
+            if(nr <0 || nr >=M || nc <0 || nc >=M) continue;
+            if(t[nr][nc] ==0 || visit[nr][nc]) continue;
+
+            size++;
+            visit[nr][nc] =1;
+            dfs(nr, nc);
+        }
+    }
+
+
+~~~
+
+
 # 22.04 28 마법사상어와 복제
 풀이정리
 
