@@ -1,6 +1,76 @@
 
 
 [TOC]
+# 22. 04 30 원판 돌리기
+풀이정리
+
+dequeue 문제라고 했는데, 그냥 벡터가 편하다.
+
+기존 맵게임 문제랑 다른건 원판이다보니, r 행 c열에서 각 행의 마지막과 열이 연결되어있는 
+
+구조라는것만 다른듯. 기본적으로 쉬운 문제
+
+~~~c++
+    void rotate(int n, int d) // n 번쨰 원판을 d만큼
+    {
+        vector<int> nn;
+        if(d==0)
+        {
+            nn.push_back(cir[n][ cir[n].size() -1]);
+            for(int i=0; i<cir[n].size()-1; i++)
+                nn.push_back(cir[n][i]);
+        }
+        else
+        {
+            for(int i= 1; i<cir[n].size(); i++)
+                nn.push_back(cir[n][i]);
+            nn.push_back(cir[n][0]);
+        }
+        cir[n]= nn;
+    }
+~~~
+
+~~~c++
+            for(int i= 0; i<N; i++)
+                for(int j=0; j<M; j++)
+                    visit[i][j] =0;
+            is_delete=0;
+            for(int i= 0; i<N; i++)
+                for(int j=0; j<M; j++)
+                {
+                    // cout<<"\ndfs start"<<i+1<<" "<<j+1<<"------------------\n";
+                    if(cir[i][j] !=0)
+                        dfs(i, j, cir[i][j] );
+                    
+                }
+
+    void dfs(int r, int c, int num) //r이 원판번호, c가 숫자번호
+    {
+        int nr;
+        int nc;   
+            // cout<<r+1<<", "<<c+1 <<" serch \n";
+        for(int d=0; d<4 ;d++ )
+        {
+            if(r==0 && d==0) continue; // 0번의 경우 자기안쪽 원판 조사할필요없음
+            if(r==N-1 && d==2) continue; // 마지막원판 경우 자기밖쪽 원판 조사할필요없음
+            nr = (r + dr[d] + N)%N;
+            nc = (c + dc[d] + M)%M;
+
+            if(visit[nr][nc]) continue;
+
+            if( cir[nr][nc] !=0 && cir[nr][nc] == num)
+            {
+                // cout<<nr+1<<", "<<nc+1 <<"과 동일\n";
+                visit[nr][nc] =1;
+
+                cir[nr][nc] =0;
+                is_delete=1;
+                dfs(nr, nc, num );
+            }
+        }
+    }
+
+~~~
 
 # 22.04 30 마법사 상어와 토네이도
 풀이정리

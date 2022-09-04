@@ -8,7 +8,7 @@ string solution(vector<string> survey, vector<int> choices) {
     string answer = "";
 
     
-    map <char, int > point;    
+    map <char, int > point;   
     int index=0;
     for(string s: survey)
     {
