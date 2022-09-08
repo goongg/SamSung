@@ -1,14 +1,111 @@
 [toc]
 
 
-### 22.09.24 짝지어 제거하기
+## 22.09.06 구명보트
+Greedy 문제, 완전탐색을 요구하는 문제가 아니란 직감이 쎄게오면 맞음.
+교훈을 이야기 하자면, 어지간하면 vector erase를 사용하는 방식으로 풀면 안된다는거.
+그리디 문제로 파악이 됐으면 무조건 그리디 조건에 초점을 맞춰야 함.
+지금 노드에서의 최선의 선택 말이지.
+나는 굳이 제일큰거와 딱 핏하게 맞는걸 찾으려고 했음.
+그럴필요가 없었기 때문에 못품.
+왜냐면 가장 큰놈이랑 가장 작은놈을 선택해도 답이 같기 때문임.
+
+그치만 이렇게 풀어도 erase를 넣으면 틀린 답이 나오고,
+이런 조건을 찾았다면 erase를 넣을 필요가 없다는것을 이해하게 됨.
+
+
+'''c++
+    잘못된 그리디
+   while(!people.empty())
+    {
+        int big = people.back();
+        people.pop_back();    
+        int small_idx=-1;
+   
+        if(people[0] + big <= limit)
+            people.erase(people.begin()+i);
+        answer++;        
+    }
+
+    잘한 그리디 
+    for (int i = 0, j = N - 1; i <= j; i++) {
+        if (people[i] + people[j] <= limit) {
+            j--;
+        }
+        res++;
+    }
+~
+
+
+
+## 22.09.05 메뉴 리뉴얼
+이문제 리얼 대박임. 여러번 풀어볼 필요가 있는듯.
+
+- comination
+  <br>
+  이젠 dfs가 익숙해지고 쉬워졌으니 dfs로 조합 처리할 필요가 있음.
+  머리만 조금 쓰자면, 조합, 순열, 중복순열 다 어렵지 않게 가능할듯
+  ```c++
+    void combination( string all_orders, string s, int depth, int idx){
+    if(s.size() == depth)
+    {
+        combi.push_back(s);
+        return;
+    }
+    
+    if(idx >= all_orders.size()) return;
+    for(int i =idx; i<all_orders.size(); i++)
+    {
+        s.push_back(all_orders[i]);
+        combination(all_orders, s, depth ,i+1);
+        s.pop_back();
+    }
+    };
+~
+
+
+- check
+  <br>
+    특정 문자열에서 char를 찾는 함수. find stl 사용
+    찾는게 없을 경우 (size_t -1) 을 return 함
+  ```c++
+    int check(vector<string> orders, string new_coures)
+    {
+    int ret=0;
+    
+    for(string s : orders)
+    {
+        bool no_found=0;
+        for(char c :new_coures )
+        {
+            if (s.find(c) == (size_t)(-1) )
+            {    
+                no_found=1;
+                break;
+            }
+        }
+        if(!no_found) ret++;
+    }
+        return ret;   
+    }
+~
+
+
+
+    
+  
+
+
+
+
+### 22.09.04 짝지어 제거하기
 Stack
 
 
-### 22.09.24 타겟 넘버
+### 22.09.04 타겟 넘버
 dfs 고수 됐음 dfs는 level3이상은 필요할듯
 
-### 22.09.24 더 맵게
+### 22.09.04 더 맵게
 문제 자체는 쉽게 풀었는데, 시간초과를 해결하지 못했음.
 기본적으로 이 문제는 우선순위 큐를 쓰라고 나온 문제임.
 우선순위 큐를 언제써야하지? 알고리즘으로 소팅하는것 보다 훨씬 편하게 쓸 수 있음. 
@@ -20,11 +117,11 @@ priority_queue<int, vector<int>, greater<int>> pq;
  pq.pop();
 
 
-### 22.09.24.기능 개발
+### 22.09.04.기능 개발
 이전 값을 참조해야할때 stack의 back 개념 활용
 
 
-### 22.09.24 124 나라의 숫자
+### 22.09.04 124 나라의 숫자
 개 쉬운건데... 진짜 답답하게도 못한다.
 10진수에서 k 진수로 바꾸기 --> 끝의 자리수만 나머지 연산하면 됨.
 이 문제의 특이한 점은 0이 없다는것... 아무튼 너무 오래걸렸다.
@@ -36,7 +133,7 @@ while(n>0)
 
 
 
-### 22.09.24 두 큐 합 같게 만들기
+### 22.09.04 두 큐 합 같게 만들기
 이건 다시 복습좀 하자. Level 2인데 자꾸 실수가 난다.
 다시 풀자 level2는 조금더 쉽게 접근할 필요가 있어 보인다.
 
@@ -46,7 +143,7 @@ while(n>0)
 
 
 
-### 22.09.23 신규 아이디 추천
+### 22.09.03 신규 아이디 추천
 stack 개념을 사용한, 중복 제거 개념.
 erase 가 잘생각이 안나긴 했음.
 근데 적어도 배열의 끝 값을 맞추기 위해 while문 back쓰는건 좋은것 같음.
