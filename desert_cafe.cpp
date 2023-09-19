@@ -27,17 +27,14 @@ bool check(int r, int c, int w, int h)
             wh =w;
         else if(d==1||d==3)
             wh =h;
-
+            
         for(int i=0; i<wh; i++)
         {
             nr+=dr[d];
             nc+=dc[d];
             if(nr == r && nc ==c) return 1;
-
             if(nr<0 || nc <0 || nr>=N || nc >=N) return 0;
-            
-            if(eated[map[nr][nc]]) return 0;
-            
+            if(eated[map[nr][nc]]) return 0;            
             eated[map[nr][nc]]=1;
         }
     }

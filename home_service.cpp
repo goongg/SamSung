@@ -44,11 +44,9 @@ int ret=0;
     {
         int nr = r + p.first;
         int nc = c + p.second;
-
         if(nr>=N || nr <0 || nc <0 || nc >=N) continue;
         if(city[nr][nc] == 1) ret++;
     }
-
     return ret;
 }
 
@@ -77,9 +75,6 @@ int main(int argc, char** argv)
         for(int i =1 ; i<=N; i++)
             zone[i+1]= next_k(zone[i]);            
         
-        // for(pii p : zone[8])
-        //     cout<< p.first<<" "<<p.second<<endl;
-
         for(int i =0; i < N; i++)
         {
             for(int j=0; j<N; j++)
@@ -89,12 +84,8 @@ int main(int argc, char** argv)
                     int people = check(i,j, k);
                     if(people < answer) continue;
 
-                    int remain_people = all_people-people;
-
                     int fee = people*M; //사람이 지불한 돈
                     int oper_fee = k*k + (k-1)*(k-1); //운영비용
-
-
 
                     if(oper_fee <= fee)
                     {
@@ -103,8 +94,8 @@ int main(int argc, char** argv)
                     }
                     int next_operfee= (k+1)*(k+1) + k*k;
 
-                    if( next_operfee - oper_fee  > remain_people*M) //다음에 추가 되는 운영비용이 남은칸의 요금 다받는것보다 크면 끝
-                        break;
+                    // if( next_operfee - oper_fee  > remain_people*M) //다음에 추가 되는 운영비용이 남은칸의 요금 다받는것보다 크면 끝
+                    //     break;
                 }
             }
         }

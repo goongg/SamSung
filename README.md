@@ -1,7 +1,28 @@
 
 
 [TOC]
+## 22.10.10 홈 방법 서비스
+풀이정리
 
+1) 마름모 영역은 최대 뻗어나갈수 있는 크기로 잡으면 됨.
+2) 음수값의 visit이 필요하면 map 활
+3) 특정 영역만 조사가 필요할 경우 아래와 같이 활용 가능할 듯.
+
+
+```c++
+int check(int r, int c, int k)
+{
+int ret=0;
+    for(pii p : zone[k])
+    {
+        int nr = r + p.first;
+        int nc = c + p.second;
+        if(nr>=N || nr <0 || nc <0 || nc >=N) continue;
+        if(city[nr][nc] == 1) ret++;
+    }
+    return ret;
+}
+```
 
 ## 22.10.09 보호 필름
 풀이 정리

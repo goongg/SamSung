@@ -44,7 +44,6 @@ void dfs(int depth, int a, int b)
                 ladder[j][i-1] ==1 ||
                   ladder[j][i+1] == 1 )
                   continue;
-            // cout<<"set:"<<j<<" "<<i<<" depth:"<<depth<<endl;
             set_ladder(j,i,1);
             dfs(depth+1, j, 1);
             set_ladder(j,i,0);        

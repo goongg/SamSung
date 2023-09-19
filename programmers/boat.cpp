@@ -30,7 +30,7 @@ int solution(vector<int> people, int limit) {
 using namespace std;
 
 int solution(vector<int> people, int limit) {
-    sort(people.begin(), people.end());
+    sort(people.begi(), people.end());
     reverse(people.begin(), people.end());
     int N = (int)people.size();
     int res = 0;
