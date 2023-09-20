@@ -1,6 +1,54 @@
 
 
 [TOC]
+## 23.09.20 녹색옷 입은애가 젤다지?
+풀이정리
+
+1) 일반적인 dp 최단거리 문제가 아님 (가다가 왼쪽이나 위로 가도 최단거리일 수 있거든)
+2) 이차원 배열을 1차원으로 치환해서 다익스트라 걸어버리는 알고리즘 이차원 배열도 늘어뜨리면 일차원 좌표로 치환가능함.
+
+- 다익스트라의 아이디어 정리
+  - 그래프 초기화 "갈 수 없는 곳은 INF로 제자리는 0으로"
+  - 그래프 이동할 때 코스트 제공한다면 (거리, 시간 등) graph에 반영
+  - 시작지의 cost와 index를 priority_queue에 넣고 bfs 시작
+  - q에서 하나씩 빼서 다음 그래프로 넘어 가는것이 현재까지 cost의 최단거리이면 넣고 돌려
+  - 방문처리가 핵심인데 여기서 같은 좌표에서 다시 뻗어나갈 필요는 없어. 즉 q에서 꺼내자 마자 방문처리를 해!
+
+```c++
+void dijk()
+{
+    priority_queue<pii, vector<pii>, greater<pii> > pq; //cost, index
+    vector<bool> visit((N+1)*(N+1));
+    int start = 0;
+
+    pq.push(make_pair(map[0][0], start));
+    for(int i =0; i<N*N; i++) cost[i] = INF;
+    cost[0] = map[0][0];
+    while(!pq.empty())
+    {
+        int u = pq.top().second;
+        pq.pop();
+        if(visit[u]) continue;
+        visit[u] =1;
+        for(int d=0; d<4; d++)
+        {
+            int r = u/N; 
+            int c = u%N;
+            int nr = r + dx[d];
+            int nc = c + dy[d];
+            int v = nr*N + nc;
+            if(nr <0 || nc<0 || nr >=N || nc>=N) continue;
+
+            if(cost[v] > cost[u] + map[nr][nc])
+            {
+                cost[v] = cost[u] + map[nr][nc];
+                pq.push(make_pair(cost[v], v));
+            }
+        }
+    }
+}
+```
+   
 ## 22.10.10 홈 방법 서비스
 풀이정리
 
